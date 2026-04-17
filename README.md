@@ -1,4 +1,4 @@
-# @orgx/ui-kit
+# @useorgx/orgx-ui-kit
 
 React components + tokens for every OrgX surface. Each component passes the orgx-design Stage 1–5 discipline before it lands.
 
@@ -18,7 +18,7 @@ React components + tokens for every OrgX surface. Each component passes the orgx
 ## Install
 
 ```bash
-npm add @orgx/ui-kit
+npm add @useorgx/orgx-ui-kit
 # peer deps
 npm add react react-dom
 ```
@@ -26,7 +26,7 @@ npm add react react-dom
 ## Usage
 
 ```tsx
-import { PreFlightCheck } from '@orgx/ui-kit';
+import { PreFlightCheck } from '@useorgx/orgx-ui-kit';
 
 <PreFlightCheck
   matches={matches}
@@ -35,7 +35,7 @@ import { PreFlightCheck } from '@orgx/ui-kit';
 />
 ```
 
-Components accept plain data props. Pair with [`@orgx/data`](https://github.com/useorgx/data) for typed contracts + hooks that fetch those props.
+Components accept plain data props. Pair with [`@useorgx/orgx-data`](https://github.com/useorgx/data) for typed contracts + hooks that fetch those props.
 
 ## Styling
 

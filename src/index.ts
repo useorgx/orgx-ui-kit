@@ -1,5 +1,5 @@
 /**
- * @orgx/ui-kit — public entry.
+ * @useorgx/orgx-ui-kit — public entry.
  *
  * React components + tokens for every OrgX surface. Each component passes
  * the orgx-design Stage 1–5 discipline; the upstream monorepo CI enforces

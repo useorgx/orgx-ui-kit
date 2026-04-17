@@ -1,5 +1,5 @@
 {
-  "name": "@orgx/ui-kit",
+  "name": "@useorgx/orgx-ui-kit",
   "version": "0.1.0-alpha.0",
   "description": "React components + tokens for every OrgX surface. Each component passes orgx-design Stages 1-5.",
   "type": "module",
@@ -17,7 +17,7 @@
   "scripts": {
     "build": "tsc",
     "type-check": "tsc --noEmit",
-    "test": "echo '@orgx/ui-kit test: no-op in MVP'"
+    "test": "echo '@useorgx/orgx-ui-kit test: no-op in MVP'"
   },
   "publishConfig": {
     "access": "public"
@@ -28,7 +28,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/useorgx/ui-kit.git"
+    "url": "https://github.com/useorgx/orgx-ui-kit.git"
   },
   "keywords": ["orgx", "ui-kit", "design-system", "react"],
   "license": "UNLICENSED",
