@@ -36,6 +36,8 @@ function colorVars(theme) {
   const lines = [];
   for (const [k, v] of Object.entries(theme)) lines.push(`--ox-${k}:${v}`);
   for (const k of RGB_KEYS) lines.push(`--ox-${k}-rgb:${hexToRgb(theme[k])}`);
+  // action-* is the primary button fill (the homepage lime); primary is the lime accent for text and tints.
+  lines.push('--ox-action:rgb(var(--ox-action-rgb))');
   lines.push('--ox-primary:rgb(var(--ox-primary-rgb))');
   return lines;
 }
@@ -105,8 +107,10 @@ const colors = {
     lime: rgbA('lime'),
     iris: rgbA('iris'),
     mute: rgbA('mute'),
+    action: rgbA('action'),
+    'action-fg': v('action-fg'),
+    'action-border': v('action-border'),
     primary: rgbA('primary'),
-    'on-primary': v('on-primary'),
     focus: v('focus'),
   },
   agent: Object.fromEntries(Object.keys(tokens.agent).map((k) => [k, `rgba(var(--agent-${k}-rgb), <alpha-value>)`])),

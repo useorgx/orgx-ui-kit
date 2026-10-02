@@ -47,13 +47,13 @@ const CSS = `
 .b[hidden]{display:none}
 .b svg{width:12px}
 .x:hover{color:var(--ox-text);background:var(--ox-hover)}
-.p{background:var(--ox-primary);color:var(--ox-on-primary);border-color:var(--ox-primary-border);box-shadow:inset 0 1px #fff4}
+.p{background:var(--ox-action);color:var(--ox-action-fg);border-color:var(--ox-action-border);box-shadow:inset 0 1px #fff4}
 [aria-disabled=true]{cursor:default;opacity:.55}
 .busy{opacity:.85!important}
 .c{position:absolute;inset:0;border-radius:inherit;overflow:hidden}
-.fill{position:absolute;inset:0;background:var(--ox-primary-hold);transform-origin:left;transform:scaleX(0);transition:transform .16s}
+.fill{position:absolute;inset:0;background:var(--ox-action-hold);transform-origin:left;transform:scaleX(0);transition:transform .16s}
 .holding .fill{transform:none;transition:transform var(--hold) linear}
-.busy .c::after{content:"";position:absolute;bottom:0;height:2px;width:40%;background:#1a12048c;animation:ox-sweep 1s linear infinite}
+.busy .c::after{content:"";position:absolute;bottom:0;height:2px;width:40%;background:currentColor;opacity:.55;animation:ox-sweep 1s linear infinite}
 @keyframes ox-sweep{from{transform:translate(-100%)}to{transform:translate(260%)}}
 .l{position:relative;display:inline-flex;align-items:center;gap:6px}
 .hold{touch-action:manipulation;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
@@ -65,12 +65,14 @@ const btn = (text: string, ext?: unknown) => `<span>${esc(text)}</span>${ext ? I
 const clean = (t: string) => t.replace(/\s*↗$/, '');
 
 /**
- * <ox-footer variant="finishes-here" state="needs-you" primary-label="Send" hold>
+ * <ox-footer variant="finishes-here" state="needs-you" primary-label="Approve">
  *
  * SM3: four footers cover every widget. The same 64 px row in every state:
  * status icon, two lines of text (what happened · what it means), at most one
  * text action and one primary. The action area reserves the width of every
- * label it shows, so the row never reflows as the state moves.
+ * label it shows, so the row never reflows as the state moves. The primary is
+ * the action lime (--ox-action, --ox-action-fg) in every widget; the needs-you
+ * amber stays on the status icon and the card edge.
  *
  * Variants and states
  *   finishes-here     needs-you · sending · held · running · done · failed
@@ -80,7 +82,7 @@ const clean = (t: string) => t.replace(/\s*↗$/, '');
  *
  * Attributes: heading, detail ("{s}" = undo seconds left), primary-label,
  * action-label (a trailing ↗ marks a link to OrgX), hold (primary is
- * hold-to-confirm), hold-ms (default 1000), undo-seconds (default 10),
+ * hold-to-confirm; for launches only, approvals are one click), hold-ms (default 1000), undo-seconds (default 10),
  * undo-deadline (epoch ms; survives reloads), disabled (view only / offline:
  * controls stay, read-only), flush (no top rule).
  * Slots: "primary" and "action" replace the built-in buttons.

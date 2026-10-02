@@ -23,8 +23,41 @@ describe('tokens', () => {
   it('defines every color token in both themes, with rgb channels for tints', () => {
     const light = Object.keys(json.color.light);
     expect(Object.keys(json.color.dark).sort()).toEqual(light.sort());
-    for (const k of [...light, 'teal-rgb', 'warning-rgb', 'danger-rgb', 'primary']) expect(css, k).toContain(`--ox-${k}:`);
+    for (const k of [...light, 'teal-rgb', 'warning-rgb', 'danger-rgb', 'primary', 'action']) expect(css, k).toContain(`--ox-${k}:`);
     expect(css).toContain('--ox-teal-rgb:0,201,167');
+  });
+
+  it('makes the primary action the homepage lime with readable text in both themes', () => {
+    const lin = (c: number) => ((c /= 255) <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
+    const rgb = (v: string) =>
+      v.startsWith('#') ? [1, 3, 5].map((i) => parseInt(v.slice(i, i + 2), 16)) : v.split(',').map(Number);
+    const lum = (v: string) => {
+      const [r, g, b] = rgb(v);
+      return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+    };
+    const ratio = (a: string, b: string) => {
+      const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p);
+      return (x + 0.05) / (y + 0.05);
+    };
+    const { dark, light } = json.color;
+    // The homepage .ox-btn-primary: --ox-action rgb(191,255,0) with --ox-action-fg #0b1203.
+    expect(dark['action-rgb']).toBe('191,255,0');
+    expect(dark['action-fg']).toBe('#0b1203');
+    expect(light['action-fg']).toBe('#0b1203');
+    for (const t of [dark, light]) {
+      expect(ratio(t['action-fg'], t['action-rgb'])).toBeGreaterThanOrEqual(7);
+      expect(ratio(t['action-fg'], t['action-hold'])).toBeGreaterThanOrEqual(4.5);
+    }
+    // On white: the edge reads, and lime is never text on white (primary is the deep lime).
+    expect(ratio(light['action-border'], light.bg)).toBeGreaterThanOrEqual(3);
+    expect(ratio(light['primary-rgb'], light.bg)).toBeGreaterThanOrEqual(4.5);
+    expect(ratio(light.focus, light.bg)).toBeGreaterThanOrEqual(3);
+    // Amber stays the needs-you tone only.
+    expect(dark.warning).toBe('#FBBF24');
+    expect(dark['edge-amber-rgb']).toBe('251,191,36');
+    for (const t of [dark, light]) for (const k of ['action-rgb', 'primary-rgb', 'focus']) expect(t[k]).not.toMatch(/251,\s*191,\s*36/);
+    expect(css).toContain('--ox-action:rgb(var(--ox-action-rgb))');
+    expect(css).toMatch(/\[data-theme="dark"\]\{[^}]*--ox-action-rgb:191,255,0/);
   });
 
   it('defines all seven agent hues', () => {

@@ -291,6 +291,25 @@ describe('<ox-footer>', () => {
     expect(p.getAttribute('aria-label')).toBe('Retry');
   });
 
+  it('approves in one click and paints the primary with the action lime, not --ox-primary', () => {
+    const el = mount('ox-footer', { variant: 'finishes-here', state: 'needs-you', 'primary-label': 'Approve' });
+    const onPrimary = vi.fn();
+    el.addEventListener('ox-primary', onPrimary);
+    const p = $<HTMLButtonElement>(el, 'button.p');
+    expect(p.classList.contains('hold')).toBe(false);
+    expect(p.hasAttribute('aria-describedby')).toBe(false);
+    p.click();
+    expect(onPrimary).toHaveBeenCalledOnce();
+    const root = shadow(el);
+    const css = [
+      ...(root.adoptedStyleSheets ?? []).flatMap((s) => Array.from(s.cssRules, (r) => r.cssText)),
+      root.querySelector('style')?.textContent ?? '',
+    ].join('\n');
+    expect(css).toMatch(/\.p\s*\{[^}]*background:\s*var\(--ox-action\)/);
+    expect(css).toMatch(/\.p\s*\{[^}]*color:\s*var\(--ox-action-fg\)/);
+    expect(css).not.toMatch(/--ox-on-primary|--ox-primary-hold|#1a1204/);
+  });
+
   it('hold-to-confirm fires only after the hold, by pointer', () => {
     const el = mount('ox-footer', {
       variant: 'finishes-here',
