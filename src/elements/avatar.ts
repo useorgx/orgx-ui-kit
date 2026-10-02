@@ -1,4 +1,4 @@
-import { OxEl, slug } from './shared.js';
+import { OxEl, avatarConfig, slug } from './shared.js';
 
 /** The seven agents and their domains. Hues live in tokens (--agent-<key>). */
 export const AGENTS = {
@@ -23,7 +23,7 @@ export const AVATAR_SIZES = [48, 96, 192] as const;
  * `-full.webp` figures) to one folder and point base-url at it, or set
  * avatarConfig.baseUrl once for the page.
  */
-export const avatarConfig = { baseUrl: 'https://mcp.useorgx.com/widgets/shared/avatars' };
+export { avatarConfig };
 
 export const avatarUrl = (baseUrl: string, agent: string, form: string, size: number | 'full'): string =>
   `${baseUrl.replace(/\/+$/, '')}/${agent}-${form}-${size}.webp`;
@@ -48,7 +48,7 @@ img{object-fit:cover}
  * in the same footprint, so nothing shifts.
  */
 export class OxAvatar extends OxEl {
-  static observedAttributes = ['agent', 'form', 'size', 'base-url', 'name'];
+  static observedAttributes = 'agent form size base-url name'.split(' ');
 
   #a: HTMLElement;
   #img: HTMLImageElement;
@@ -77,13 +77,13 @@ export class OxAvatar extends OxEl {
   }
 
   protected _render() {
-    const agent = slug(this.getAttribute('agent')) || 'xandy';
+    const agent = slug(this._a('agent')) || 'xandy';
     const known = agent in AGENTS;
-    const f = slug(this.getAttribute('form'));
+    const f = slug(this._a('form'));
     const form = (AVATAR_FORMS as readonly string[]).includes(f) ? f : 'base';
-    const name = this.getAttribute('name') || agent[0]!.toUpperCase() + agent.slice(1);
-    const size = Math.max(16, Math.round(+this.getAttribute('size')! || 48));
-    const base = this.getAttribute('base-url') ?? avatarConfig.baseUrl;
+    const name = this._a('name') || agent[0]!.toUpperCase() + agent.slice(1);
+    const size = Math.max(16, Math.round(+this._a('size')! || 48));
+    const base = this._a('base-url') ?? avatarConfig.baseUrl;
     // Smallest render at least as large as the display size, plus a 2x source.
     const asset = AVATAR_SIZES.find((s) => s >= size) ?? 192;
     const retina = AVATAR_SIZES.find((s) => s >= size * 2);

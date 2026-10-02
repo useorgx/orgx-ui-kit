@@ -1,19 +1,10 @@
-import { FOOTER_FRAMES, resolveFooter, type FooterFrame, type FooterVariant } from './states.js';
+import { FOOTER_FRAMES, resolveFooter, type FooterFrame, type FooterVariant } from './frames.js';
 import { ICON, OxEl, emit, esc, ring, slug } from './shared.js';
 
-const ICONS: Record<FooterFrame['icon'], string> = {
-  seal: ICON.check,
-  check: ICON.check,
-  app: ICON.lock,
-  lock: ICON.lock,
-  spin: ICON.spin,
-  ring: ring(22, 3, '53.4'),
-  alert: ICON.alert,
-  part: ICON.alert,
-  clock: ICON.clock,
-  x: ICON.x,
-  skel: '',
-};
+/** Footer icon -> ICON key (the ring is drawn here; skel has none). */
+const ICON_OF: Partial<Record<FooterFrame['icon'], keyof typeof ICON>> = { seal: 'check', app: 'lock', part: 'alert' };
+const icon = (k: FooterFrame['icon']): string =>
+  k == 'ring' ? ring(22, 3, '53.4') : k == 'skel' ? '' : ICON[ICON_OF[k] ?? (k as keyof typeof ICON)];
 
 const CSS = `
 :host{display:block;min-width:0}
@@ -90,21 +81,10 @@ const clean = (t: string) => t.replace(/\s*↗$/, '');
  * ox-action, ox-undo, ox-undo-expired.
  */
 export class OxFooter extends OxEl {
-  static observedAttributes = [
-    'variant',
-    'state',
-    'heading',
-    'detail',
-    'primary-label',
-    'action-label',
-    'hold',
-    'hold-ms',
-    'undo-seconds',
-    'undo-deadline',
-    'disabled',
-  ];
+  static observedAttributes = 'variant state heading detail primary-label action-label hold hold-ms undo-seconds undo-deadline disabled'.split(' ');
 
   #seen = new Set<string>();
+  #ghost = '';
   #key = '';
   #locked = false;
   #state = '';
@@ -183,11 +163,11 @@ export class OxFooter extends OxEl {
   }
 
   protected _render() {
-    const { variant, state, frame } = resolveFooter(this.getAttribute('variant'), this.getAttribute('state'));
+    const { variant, state, frame } = resolveFooter(this._a('variant'), this._a('state'));
     const was = this.#state;
     const focused = this.matches(':focus-within');
     const pick = (attr: string, k: 'heading' | 'detail' | 'primary' | 'action') =>
-      k == 'heading' || k == 'detail' || frame[k] != null ? (this.getAttribute(attr) ?? frame[k] ?? '') : '';
+      k == 'heading' || k == 'detail' || frame[k] != null ? (this._a(attr) ?? frame[k] ?? '') : '';
     const key = variant + state;
     const changed = key != this.#key;
     const off = this.hasAttribute('disabled');
@@ -206,7 +186,7 @@ export class OxFooter extends OxEl {
     if (changed) {
       const i = this._q('.i');
       i.dataset.k = frame.icon;
-      i.innerHTML = ICONS[frame.icon];
+      i.innerHTML = icon(frame.icon);
       // SM0: footer content crossfades in place (120 ms).
       if (this.#key) (t.classList.remove('n'), t.offsetWidth, t.classList.add('n'));
     }
@@ -221,7 +201,7 @@ export class OxFooter extends OxEl {
     this.#x.setAttribute('aria-disabled', String(off || this.#expired));
 
     const hold = this.hasAttribute('hold') && !!this.#primary && !frame.busy;
-    const ms = +this.getAttribute('hold-ms')! || 1e3;
+    const ms = +this._a('hold-ms')! || 1e3;
     p.classList.toggle('hold', hold);
     p.style.setProperty('--hold', ms + 'ms');
     // The button's name stays its label; the hold instruction is its description.
@@ -242,8 +222,7 @@ export class OxFooter extends OxEl {
         return `<span class="b ${k}"><span class="l">${btn(l!, e)}</span></span>`;
       })
       .join('');
-    const g = this._q('.g');
-    if (g.innerHTML != ghost) g.innerHTML = ghost;
+    if (this.#ghost != ghost) this._q('.g').innerHTML = this.#ghost = ghost;
 
     if (state != 'held') this.#stopUndo();
     else if (was != 'held' || changed || this.#restart) this.#startUndo();
@@ -270,9 +249,9 @@ export class OxFooter extends OxEl {
   #startUndo() {
     this.#stopUndo();
     this.#restart = false;
-    const secs = +this.getAttribute('undo-seconds')! || 10;
+    const secs = +this._a('undo-seconds')! || 10;
     const now = Date.now();
-    const dl = (this.#deadline = +this.getAttribute('undo-deadline')! || now + secs * 1e3);
+    const dl = (this.#deadline = +this._a('undo-deadline')! || now + secs * 1e3);
     const left = Math.max(0, dl - now);
     const total = Math.max(secs * 1e3, left);
     const ring = this._q('.ring');
@@ -334,7 +313,7 @@ export class OxFooter extends OxEl {
     p.classList.add('holding');
     p.setAttribute('aria-pressed', 'true');
     p.querySelector('.l span')!.textContent = 'Holding…';
-    this.#hold = setTimeout(() => (this.#endHold(), this.#fire(true)), +this.getAttribute('hold-ms')! || 1e3);
+    this.#hold = setTimeout(() => (this.#endHold(), this.#fire(true)), +this._a('hold-ms')! || 1e3);
   }
 
   #endHold() {

@@ -1,6 +1,6 @@
 {
   "name": "@useorgx/orgx-ui-kit",
-  "version": "0.2.0-alpha.1",
+  "version": "0.2.0-alpha.2",
   "description": "OrgX design core: tokens, framework-free custom elements for MCP widgets, and React components and wrappers for the app.",
   "type": "module",
   "main": "dist/index.js",
@@ -16,6 +16,10 @@
       "import": "./dist/elements/index.js"
     },
     "./elements.iife.js": "./dist/elements.iife.js",
+    "./elements-core.iife.js": "./dist/elements-core.iife.js",
+    "./elements-footer.iife.js": "./dist/elements-footer.iife.js",
+    "./elements-glyph.iife.js": "./dist/elements-glyph.iife.js",
+    "./elements-avatar.iife.js": "./dist/elements-avatar.iife.js",
     "./elements.min.js": "./dist/elements.min.js",
     "./react": {
       "types": "./dist/react/index.d.ts",
@@ -36,8 +40,9 @@
   },
   "sideEffects": [
     "./dist/elements/index.js",
-    "./dist/elements/iife.js",
     "./dist/elements.iife.js",
+    "./dist/elements-*.iife.js",
+    "./dist/elements/iife*.js",
     "./dist/elements.min.js",
     "./dist/react/index.js",
     "*.css"

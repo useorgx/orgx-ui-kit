@@ -1,5 +1,4 @@
-import { glyphSvg } from './glyph.js';
-import { ICON, OxEl, emit, esc, slug } from './shared.js';
+import { ICON, OxEl, QUESTION, emit, esc, slug, svg24 } from './shared.js';
 
 /**
  * Receipt row statuses, from the K1/K4 receipt cards and the F1 evidence rows:
@@ -52,7 +51,7 @@ a.r:focus-visible{outline-offset:-2px;border-radius:8px}
  * widgets can route it through openWidgetLink instead of a raw navigation.
  */
 export class OxReceiptRow extends OxEl {
-  static observedAttributes = ['status', 'label', 'value', 'detail', 'href', 'target'];
+  static observedAttributes = 'status label value detail href target'.split(' ');
 
   constructor() {
     super('<div class="w"></div>', CSS);
@@ -69,7 +68,7 @@ export class OxReceiptRow extends OxEl {
 
   /** The resolved status; setting it sets the attribute (React 19 assigns properties). */
   get status(): ReceiptStatus {
-    return resolveReceiptStatus(this.getAttribute('status'));
+    return resolveReceiptStatus(this._a('status'));
   }
   set status(v: string) {
     this.setAttribute('status', v);
@@ -77,15 +76,15 @@ export class OxReceiptRow extends OxEl {
 
   /** The link target, or null. Only http(s), mailto and relative URLs become links. */
   get safeHref(): string | null {
-    const h = this.getAttribute('href');
+    const h = this._a('href');
     return h && /^(https?:|mailto:|[/#?.])/i.test(h.trim()) ? h : null;
   }
 
   protected _render() {
     const st = this.status;
-    const a = (n: string) => esc(this.getAttribute(n) ?? '');
+    const a = (n: string) => esc(this._a(n) ?? '');
     const href = this.safeHref;
-    const target = this.getAttribute('target') ?? '_blank';
+    const target = this._a('target') ?? '_blank';
     const value = a('value');
     const detail = a('detail');
     const icon =
@@ -94,7 +93,7 @@ export class OxReceiptRow extends OxEl {
         : st == 'fail'
           ? ICON.alert
           : st == 'yours'
-            ? glyphSvg('question', 15)
+            ? svg24(QUESTION, 15)
             : st == 'unverified'
               ? '<i class="h"></i>'
               : ICON.spin;

@@ -6,7 +6,8 @@ The OrgX design core: one token source, framework-free custom elements for MCP w
 | --- | --- | --- |
 | `@useorgx/orgx-ui-kit/tokens.css` | `--ox-*` variables (light default, dark via `[data-theme="dark"]` or the OS) and `--agent-<key>` / `--agent-<key>-rgb` hues | everywhere |
 | `@useorgx/orgx-ui-kit/elements` | ES module; importing it defines every element once | apps with a bundler |
-| `@useorgx/orgx-ui-kit/elements.iife.js` | self-contained script (no dependencies); exposes `window.OrgXElements` | inline in MCP widget HTML |
+| `@useorgx/orgx-ui-kit/elements.iife.js` | self-contained script (no dependencies), every element; exposes `window.OrgXElements` | inline in MCP widget HTML |
+| `@useorgx/orgx-ui-kit/elements-core.iife.js` + `elements-{footer,glyph,avatar}.iife.js` | the same, split: core (runtime, chip, attention line, receipt row) plus one add-on per heavier element | inline only what a widget uses |
 | `@useorgx/orgx-ui-kit/react` | typed React wrappers for each element (React 18 or 19, peer dependency) | the app |
 | `@useorgx/orgx-ui-kit/tailwind-preset` | Tailwind preset whose colors resolve to the CSS variables | the app |
 | `@useorgx/orgx-ui-kit/tokens` | the token object as ESM (`tokens.json` is also exported) | scripts, charts |
@@ -46,9 +47,29 @@ Inline both files into the widget HTML so it renders with no network round-trip:
 </script>
 ```
 
+### Only what the widget uses
+
+`elements.iife.js` defines all six elements. A widget that uses a few can inline the split bundles instead: `elements-core.iife.js` first (the shared runtime plus `<ox-state-chip>`, `<ox-attention-line>` and `<ox-receipt-row>`), then any of `elements-footer.iife.js`, `elements-glyph.iife.js` and `elements-avatar.iife.js`. The add-ons reuse the core runtime from `window.OrgXElements`, so an add-on loaded without core throws `load elements-core.iife.js (or elements.iife.js) before ...`. Every bundle registers idempotently and the first copy wins (constructors, runtime, `avatarConfig`), so loading one twice, or the full bundle next to the split ones, is a no-op. Take all of them from the same build.
+
+```html
+<script>/* elements-core.iife.js */</script>
+<script>/* elements-footer.iife.js */</script>
+<ox-footer variant="reads" state="fresh"></ox-footer>
+```
+
+| bundle | elements | min | gzip | budget (build fails above) |
+| --- | --- | --- | --- | --- |
+| `elements.iife.js` | all six | 24.9 KB | 10.4 KB | 26 KB (warns above 25 KB) |
+| `elements-core.iife.js` | runtime, `ox-state-chip`, `ox-attention-line`, `ox-receipt-row` | 11.3 KB | 5.3 KB | 12 KB |
+| `elements-footer.iife.js` | `ox-footer` | 9.8 KB | 4.5 KB | 10.5 KB |
+| `elements-glyph.iife.js` | `ox-glyph` | 2.5 KB | 1.2 KB | 3 KB |
+| `elements-avatar.iife.js` | `ox-avatar` | 2.2 KB | 1.3 KB | 3 KB |
+
+The budgets live in `scripts/build-bundles.mjs`; `npm run build` prints every size. To keep the inlined bytes down, the build minifies each element stylesheet and abbreviates common CSS words with the dictionary in `src/elements/shared.ts` (expanded once per stylesheet at runtime), and drops the quotes around plain markup attribute values in the IIFEs; the DOM and CSS the browser gets are unchanged.
+
 Theme: the widget SDK sets `data-theme` on `<html>` from `?theme=`; without it the OS preference applies. The elements read nothing but `--ox-*` and `--agent-*` variables, so there is nothing else to configure.
 
-Size: `elements.iife.js` is 28.6 KB minified, 10.4 KB gzip (`npm run build` prints it; the target is 25 KB and the build fails above 32 KB).
+Size: `elements.iife.js` is 24.9 KB minified, 10.4 KB gzip (`npm run build` prints it; the target is 25 KB and the build fails above 26 KB). See the split bundles above for widgets that use only some elements.
 
 ## The app (React + Tailwind)
 

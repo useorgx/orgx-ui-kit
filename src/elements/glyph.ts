@@ -1,4 +1,4 @@
-import { OxEl } from './shared.js';
+import { FIELD, OxEl, QUESTION, SOLID, svg24 } from './shared.js';
 
 /*
  * G1 "One shape per kind of work": 24-point grid, 1.8 stroke, round caps.
@@ -6,6 +6,8 @@ import { OxEl } from './shared.js';
  * Muted by default, amber when it needs you, teal when accepted.
  * Inner SVG copied from the canvas glyph set (LiveWidgetIcons grammar);
  * `~` stands for the tinted-field fill and `@` for a solid mark, expanded below.
+ * A shape that is both a field and an outline is one element with fill and
+ * stroke (the canvas drew it twice).
  */
 const SRC = {
   goal: '<circle cx="12" cy="12" r="9.5" ~/><path d="M4.6 18.2 6.9 14.6h10.3l1.9 3.6z" fill="currentColor" fill-opacity=".55" stroke="none"/><path d="M3.8 18.2 10 8.6l2.5 3.5 2.3-2.9 5.4 9"/><path d="M3.8 18.2h16.4"/>',
@@ -17,11 +19,10 @@ const SRC = {
   run: '<circle cx="12" cy="12" r="9" ~/><path d="M10 8.5v7l5.5-3.5z" fill="currentColor"/>',
   decision:
     '<path d="M12 2.8 21.2 12 12 21.2 2.8 12z" ~/><path d="M12 17.5v-5"/><path d="M12 12.5 8.5 8.2"/><path d="M12 12.5l3.5-4.3"/><circle cx="8.5" cy="8.2" r="1.4" @/><circle cx="15.5" cy="8.2" r="1.4" @/>',
-  question:
-    '<path d="M4 6.5A3.5 3.5 0 0 1 7.5 3h9A3.5 3.5 0 0 1 20 6.5v6a3.5 3.5 0 0 1-3.5 3.5H11l-4.5 4v-4A3.5 3.5 0 0 1 4 12.5z" ~/><path d="M9.6 8.2a2.5 2.5 0 0 1 4.8.8c0 1.6-2.4 1.9-2.4 3.2"/><circle cx="12" cy="14.6" r="1.1" @/>',
-  artifact: '<path d="M6 3h8l4 4v14H6z" ~/><path d="M14 3v4h4"/><path d="M6 3h8l4 4v14H6z"/><path d="M9 12h6M9 15.5h4"/>',
+  question: QUESTION,
+  artifact: '<path d="M6 3h8l4 4v14H6z" fill="currentColor" fill-opacity=".1"/><path d="M14 3v4h4"/><path d="M9 12h6M9 15.5h4"/>',
   receipt:
-    '<path d="M6 3h12v18l-2-1.4-2 1.4-2-1.4-2 1.4-2-1.4-2 1.4z" ~/><path d="M6 3h12v18l-2-1.4-2 1.4-2-1.4-2 1.4-2-1.4-2 1.4z"/><path d="M9 10.6 11 12.6 15 8.6"/><path d="M9 16h6"/>',
+    '<path d="M6 3h12v18l-2-1.4-2 1.4-2-1.4-2 1.4-2-1.4-2 1.4z" fill="currentColor" fill-opacity=".1"/><path d="M9 10.6 11 12.6 15 8.6"/><path d="M9 16h6"/>',
 };
 
 export type GlyphKind = keyof typeof SRC;
@@ -29,14 +30,10 @@ export const GLYPH_KINDS = Object.keys(SRC) as GlyphKind[];
 
 /** Inner SVG markup per kind (24 x 24 viewBox). */
 export const GLYPHS = Object.fromEntries(
-  GLYPH_KINDS.map((k) => [
-    k,
-    SRC[k].replace(/~/g, 'fill="currentColor" fill-opacity=".1" stroke="none"').replace(/@/g, 'fill="currentColor" stroke="none"'),
-  ]),
+  GLYPH_KINDS.map((k) => [k, SRC[k].replace(/~/g, FIELD).replace(/@/g, SOLID)]),
 ) as Record<GlyphKind, string>;
 
-export const glyphSvg = (kind: string, size = 18): string =>
-  `<svg width="${size}" height="${size}" style="width:var(--ox-glyph-size,${size}px);height:var(--ox-glyph-size,${size}px)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${GLYPHS[kind as GlyphKind] ?? GLYPHS.task}</svg>`;
+export const glyphSvg = (kind: string, size = 18): string => svg24(GLYPHS[kind as GlyphKind] ?? GLYPHS.task, size);
 
 const CSS = `
 :host{display:inline-grid;place-items:center;vertical-align:middle;flex:none;color:var(--ox-text-muted);line-height:0}
@@ -58,18 +55,18 @@ span{display:contents}
  * container at once.
  */
 export class OxGlyph extends OxEl {
-  static observedAttributes = ['kind', 'size', 'label'];
+  static observedAttributes = 'kind size label'.split(' ');
 
   constructor() {
     super('<span></span>', CSS);
   }
 
   protected _render() {
-    const raw = (this.getAttribute('kind') ?? '').toLowerCase();
+    const raw = (this._a('kind') ?? '').toLowerCase();
     const kind = raw in SRC ? raw : 'task';
-    this._q('span').innerHTML = glyphSvg(kind, +this.getAttribute('size')! || 18);
+    this._q('span').innerHTML = glyphSvg(kind, +this._a('size')! || 18);
     this.dataset.kind = kind;
-    const label = this.getAttribute('label')?.trim();
+    const label = this._a('label')?.trim();
     if (label) {
       this.setAttribute('role', 'img');
       this.setAttribute('aria-label', label == 'auto' ? kind[0]!.toUpperCase() + kind.slice(1) : label);
