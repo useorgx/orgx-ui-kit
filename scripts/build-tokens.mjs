@@ -89,7 +89,7 @@ writeFileSync(
 // Tailwind preset: every color resolves to a CSS variable, so one class works in both
 // themes and no dark: variant is needed.
 const v = (name) => `var(--ox-${name})`;
-const rgbA = (name) => `rgb(var(--ox-${name}-rgb) / <alpha-value>)`;
+const rgbA = (name) => `rgba(var(--ox-${name}-rgb), <alpha-value>)`;
 const colors = {
   ox: {
     bg: v('bg'),
@@ -113,7 +113,7 @@ const colors = {
     primary: rgbA('primary'),
     focus: v('focus'),
   },
-  agent: Object.fromEntries(Object.keys(tokens.agent).map((k) => [k, `rgb(var(--agent-${k}-rgb) / <alpha-value>)`])),
+  agent: Object.fromEntries(Object.keys(tokens.agent).map((k) => [k, `rgba(var(--agent-${k}-rgb), <alpha-value>)`])),
   // The 0.1 React surfaces use iris-400; keep that class working.
   iris: { DEFAULT: rgbA('iris'), 300: '#a5b4fc', 400: '#818cf8', 500: '#6366f1', 600: '#4f46e5' },
 };

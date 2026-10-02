@@ -78,9 +78,9 @@ describe('tokens', () => {
 
   it('builds a Tailwind preset and an ESM token object from the same source', async () => {
     const preset = createRequire(import.meta.url)(resolve(root, 'dist/tailwind-preset.cjs'));
-    expect(preset.theme.extend.colors.ox.teal).toBe('rgb(var(--ox-teal-rgb) / <alpha-value>)');
+    expect(preset.theme.extend.colors.ox.teal).toBe('rgba(var(--ox-teal-rgb), <alpha-value>)');
     expect(preset.theme.extend.colors.ox.bg).toBe('var(--ox-bg)');
-    expect(preset.theme.extend.colors.agent.dana).toBe('rgb(var(--agent-dana-rgb) / <alpha-value>)');
+    expect(preset.theme.extend.colors.agent.dana).toBe('rgba(var(--agent-dana-rgb), <alpha-value>)');
     const mod = await import(resolve(root, 'dist/tokens.js'));
     expect(mod.tokens.agent.xandy.hue).toBe('#6366f1');
     expect(mod.default).toEqual(json);
