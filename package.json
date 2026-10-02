@@ -1,7 +1,7 @@
 {
   "name": "@useorgx/orgx-ui-kit",
-  "version": "0.1.0-alpha.0",
-  "description": "React components + tokens for every OrgX surface. Each component passes orgx-design Stages 1-5.",
+  "version": "0.2.0-alpha.0",
+  "description": "OrgX design core: tokens, framework-free custom elements for MCP widgets, and React components and wrappers for the app.",
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -10,15 +10,49 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
-    }
+    },
+    "./elements": {
+      "types": "./dist/elements/index.d.ts",
+      "import": "./dist/elements/index.js"
+    },
+    "./elements.iife.js": "./dist/elements.iife.js",
+    "./elements.min.js": "./dist/elements.min.js",
+    "./react": {
+      "types": "./dist/react/index.d.ts",
+      "import": "./dist/react/index.js"
+    },
+    "./tokens": {
+      "types": "./dist/tokens.d.ts",
+      "import": "./dist/tokens.js"
+    },
+    "./tokens.css": "./dist/tokens.css",
+    "./tokens.json": "./tokens/tokens.json",
+    "./tailwind-preset": {
+      "types": "./dist/tailwind-preset.d.cts",
+      "require": "./dist/tailwind-preset.cjs",
+      "default": "./dist/tailwind-preset.cjs"
+    },
+    "./package.json": "./package.json"
   },
-  "sideEffects": false,
-  "files": ["dist", "README.md"],
+  "sideEffects": [
+    "./dist/elements/index.js",
+    "./dist/elements/iife.js",
+    "./dist/elements.iife.js",
+    "./dist/elements.min.js",
+    "./dist/react/index.js",
+    "*.css"
+  ],
+  "files": [
+    "dist",
+    "tokens",
+    "README.md"
+  ],
   "scripts": {
     "prepare": "npm run build",
-    "build": "tsc",
+    "build": "node scripts/build-tokens.mjs && tsc && node scripts/build-bundles.mjs",
+    "build:tokens": "node scripts/build-tokens.mjs",
     "type-check": "tsc --noEmit",
-    "test": "echo '@useorgx/orgx-ui-kit test: no-op in MVP'"
+    "test": "vitest run"
   },
   "publishConfig": {
     "access": "public"
@@ -27,17 +61,38 @@
     "react": "^18.0.0 || ^19.0.0",
     "react-dom": "^18.0.0 || ^19.0.0"
   },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    }
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/useorgx/orgx-ui-kit.git"
   },
-  "keywords": ["orgx", "ui-kit", "design-system", "react"],
+  "keywords": [
+    "orgx",
+    "ui-kit",
+    "design-system",
+    "design-tokens",
+    "web-components",
+    "custom-elements",
+    "react",
+    "tailwind",
+    "mcp"
+  ],
   "license": "UNLICENSED",
   "devDependencies": {
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "esbuild": "^0.28.2",
+    "jsdom": "^29.1.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "typescript": "^5.4.0"
+    "typescript": "^5.4.0",
+    "vitest": "^5.0.3"
   }
 }

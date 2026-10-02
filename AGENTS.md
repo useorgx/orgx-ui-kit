@@ -25,6 +25,9 @@ bash .codex/maintenance-cloud.sh
 ```bash
 npm run type-check
 npm run build
+npm test
 ```
+
+Tokens live in `tokens/tokens.json`; edit it, never the generated `dist/tokens.*` files. The framework-free elements in `src/elements` must stay dependency-free and themed only through `--ox-*` variables; `npm run build` reports the IIFE size (target 25 KB). `demo/index.html` shows every element in every state.
 
 When touching visual components, also verify the downstream surface that consumes the component. Static TypeScript success is not visual QA.
