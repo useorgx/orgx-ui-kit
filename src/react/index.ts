@@ -101,7 +101,12 @@ function wrap<P extends OxBaseProps, E extends HTMLElement>(
       }
     });
 
-    const domProps: Record<string, unknown> = { ref: node };
+    // The element stamps its own host when it upgrades (data-agent, data-form,
+    // data-state, role, aria-label, ...), and with SSR that happens before
+    // React hydrates, so React would report every server-rendered kit element
+    // as an attribute mismatch. Those attributes are the element's, not
+    // React's: suppress the warning on the host only (children still check).
+    const domProps: Record<string, unknown> = { ref: node, suppressHydrationWarning: true };
     if (props.id) domProps.id = props.id;
     if (props.className) domProps.className = props.className;
     if (props.style) domProps.style = props.style;
