@@ -1,6 +1,6 @@
 # @useorgx/orgx-ui-kit
 
-The OrgX design core: one token source, framework-free custom elements for MCP widgets, and React for the app. Quiet when fine, loud only when it needs you: amber means it needs you, teal means accepted or moving, red means it failed and can be retried.
+The OrgX design core: one token source, framework-free custom elements for MCP widgets, and React for the app. Quiet when fine, loud only when it needs you: amber means it needs you, teal means accepted or moving, red means it failed and can be retried. The one primary action is the homepage lime (`--ox-action`) with dark text, in every widget and both themes.
 
 | Entry point | What it is | Use it in |
 | --- | --- | --- |
@@ -28,7 +28,7 @@ Inline both files into the widget HTML so it renders with no network round-trip:
   <ox-receipt-row status="met" label="CI run 1182 · passed" value="2d ago" href="https://useorgx.com/..."></ox-receipt-row>
   <ox-receipt-row status="fail" label="Runbook covers the new retry behavior" detail="Docs · Judged · runbook not updated"></ox-receipt-row>
 
-  <ox-footer id="ft" variant="finishes-here" state="needs-you" heading="Finishes here" detail="undo 10 s" primary-label="Send" hold></ox-footer>
+  <ox-footer id="ft" variant="finishes-here" state="needs-you" heading="Finishes here" detail="undo 10 s" primary-label="Send"></ox-footer>
 </article>
 
 <script>
@@ -141,7 +141,7 @@ The four footers from SM3. One 64 px row in every state: status icon, two lines 
 
 - Copy: `heading`, `detail`, `primary-label`, `action-label` describe the current state (set them with the state); a trailing ` ↗` or a frame that opens OrgX adds the external arrow and ", opens OrgX" to the name. Defaults are the SM3 wording.
 - Undo window (`held`): `undo-seconds` (default 10) or `undo-deadline` (epoch ms, so a reload shows the true time left). The ring drains linearly, `{s}` in `detail` ticks in tabular figures, and "Undo available for N seconds" is announced once. Events: `ox-undo`, `ox-undo-expired`.
-- Hold to confirm: `hold` (and `hold-ms`, default 1000). Pointer down or Space/Enter held for the full time fires `ox-confirm` then `ox-primary`; releasing early cancels, a click alone never sends, key repeat is ignored. Reduced motion fills in four still steps.
+- Hold to confirm: `hold` (and `hold-ms`, default 1000), for launches only ("Hold to launch"); approvals are a single click. Pointer down or Space/Enter held for the full time fires `ox-confirm` then `ox-primary`; releasing early cancels, a click alone never sends, key repeat is ignored. Reduced motion fills in four still steps.
 - The primary locks in the same frame as the press (no double send) until `state` changes. `disabled` keeps the controls but makes them read-only (view only, offline). When the state moves under focus, focus moves to the new control (SM5: failure focuses Retry).
 - Events (bubbling, composed): `ox-primary`, `ox-confirm`, `ox-action` (`detail.action`), `ox-undo`, `ox-undo-expired`. Slots `primary` / `action` replace the built-in buttons.
 
@@ -177,7 +177,20 @@ The default is `https://mcp.useorgx.com/widgets/shared/avatars`. The renders are
 
 ## Tokens
 
-`tokens/tokens.json` is the single source: light and dark colors (from the OrgX design canvas), type, radius, space, sizes, motion durations and easings, and agent hues. `npm run build:tokens` writes `dist/tokens.css`, `dist/tokens.js` and `dist/tailwind-preset.cjs`. Edit the JSON, never the outputs.
+`tokens/tokens.json` is the single source: light and dark colors (from the OrgX design canvas), type, radius, space, sizes, motion durations and easings, and agent hues.
+
+The primary button matches the OrgX homepage (`.ox-btn-primary`): `--ox-action` / `--ox-action-rgb` is the fill, `--ox-action-fg` the text, `--ox-action-border` its edge and `--ox-action-hold` the hold fill. `--ox-primary` / `--ox-primary-rgb` is the lime accent for text and tints, and `--ox-focus` the focus ring. Widgets restyle their own accents freely; the kit's primary reads only `--ox-action*`, so it stays lime.
+
+| Token | Dark | Light | Contrast |
+| --- | --- | --- | --- |
+| `--ox-action-rgb` | `191,255,0` (homepage lime) | `132,204,22` (the app's light-mode lime) | |
+| `--ox-action-fg` | `#0b1203` (app `--ox-action-fg`) | `#0b1203` | 15.9:1 dark, 9.7:1 light |
+| `--ox-action-border` | `transparent` | `#65a30d` | 3.1:1 on white |
+| `--ox-action-hold` | `#65a30d` | `#65a30d` | text 6.2:1 |
+| `--ox-primary-rgb` | `191,255,0` | `77,124,15` | 5.0:1 on white (never lime text on white) |
+| `--ox-focus` | `rgba(191,255,0,.8)` | `#4d7c0f` | 10.8:1 dark, 5.0:1 light |
+
+Amber (`--ox-warning`, `--ox-edge-amber-rgb`) is reserved for "needs you": the attention line, needs-you chips and glyphs, held and draft states. `npm run build:tokens` writes `dist/tokens.css`, `dist/tokens.js` and `dist/tailwind-preset.cjs`. Edit the JSON, never the outputs.
 
 ## Development
 

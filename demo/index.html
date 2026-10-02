@@ -86,7 +86,7 @@
     <div>
       <span class="lbl">@useorgx/orgx-ui-kit · elements</span>
       <h1>Every element, every state</h1>
-      <p class="sub">Framework-free custom elements, themed only by <code>--ox-*</code> tokens. Quiet when fine, amber when it needs you, teal when accepted or moving, red when it failed and can be retried.</p>
+      <p class="sub">Framework-free custom elements, themed only by <code>--ox-*</code> tokens. Quiet when fine, amber when it needs you, teal when accepted or moving, red when it failed and can be retried. The one primary action is the homepage lime.</p>
     </div>
     <span class="sp"></span>
     <button class="theme-btn" id="theme" type="button">Switch theme</button>
@@ -218,11 +218,11 @@
     }).join('');
     document.getElementById('footers').append(h('<div class="variant"><div class="who"><b>' + v[1] + '</b><span class="cap" style="margin:0">' + v[2] + '</span></div><div class="grid">' + frames + '</div></div>'));
   });
-  // Hold to confirm (P7-C): resting, and mid-hold.
+  // Hold to launch (P7-C): resting, and mid-hold. Approvals never hold.
   document.getElementById('footers').append(h(
-    '<div class="variant"><div class="who"><b>Hold to confirm</b><span class="cap" style="margin:0">Pointer or Space/Enter held for 1 s; a click alone never sends</span></div><div class="grid">' +
-    '<div class="frame"><div class="card"><ox-footer flush variant="finishes-here" state="needs-you" heading="Checked against version 7" detail="Smoke test on staging" primary-label="Hold to send" hold></ox-footer></div><div class="cap">Resting</div></div>' +
-    '<div class="frame"><div class="card"><ox-footer id="holding" class="frozen" flush variant="finishes-here" state="needs-you" heading="Checked against version 12" detail="Canary 10% for 24h, then full" primary-label="Hold to send" hold hold-ms="600000"></ox-footer></div><div class="cap">Holding · 62%</div></div>' +
+    '<div class="variant"><div class="who"><b>Hold to launch</b><span class="cap" style="margin:0">Launches only: pointer or Space/Enter held for 1 s. Approvals are one click.</span></div><div class="grid">' +
+    '<div class="frame"><div class="card"><ox-footer flush variant="finishes-here" state="needs-you" heading="Checked against version 7" detail="Smoke test on staging" primary-label="Hold to launch" hold></ox-footer></div><div class="cap">Resting</div></div>' +
+    '<div class="frame"><div class="card"><ox-footer id="holding" class="frozen" flush variant="finishes-here" state="needs-you" heading="Checked against version 12" detail="Canary 10% for 24h, then full" primary-label="Hold to launch" hold hold-ms="600000"></ox-footer></div><div class="cap">Holding · 62%</div></div>' +
     '<div class="frame"><div class="card"><ox-footer flush variant="finishes-here" state="needs-you" heading="View only" detail="Priya decides · Eli recommends canary" primary-label="Send" disabled></ox-footer></div><div class="cap">View only (disabled)</div></div>' +
     '</div></div>'));
   var holdBtn = document.getElementById('holding').shadowRoot.querySelector('button.p');

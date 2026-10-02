@@ -87,7 +87,7 @@ export interface FooterFrame {
   icon: FooterIcon;
   heading: string;
   detail: string;
-  /** Primary button label (amber fill). */
+  /** Primary button label (action lime fill). */
   primary?: string;
   /** Text action label. */
   action?: string;
