@@ -1,8 +1,10 @@
 /**
- * Entry for dist/elements.iife.js: defines every element on load and exposes
- * a small global, window.OrgXElements = { defineElements, avatarConfig, ELEMENTS }.
+ * Entry for dist/elements.iife.js (everything): defines every element on load
+ * and exposes window.OrgXElements = { defineElements, avatarConfig, ELEMENTS }.
+ * Loading it next to the split bundles, or twice, is a no-op.
  */
-import { ELEMENTS, defineElements } from './define.js';
-export { avatarConfig } from './avatar.js';
-export { ELEMENTS, defineElements };
-defineElements();
+import { ELEMENTS } from './define.js';
+import { runtime } from './runtime.js';
+import { install } from './shared.js';
+
+install(ELEMENTS, runtime);

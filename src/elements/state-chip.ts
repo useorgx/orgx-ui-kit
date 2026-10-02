@@ -33,7 +33,7 @@ const CSS = `
  *            reserves width for, so a row never reflows as the state moves
  */
 export class OxStateChip extends OxEl {
-  static observedAttributes = ['state', 'label', 'detail', 'seconds', 'reserve'];
+  static observedAttributes = 'state label detail seconds reserve'.split(' ');
 
   #prev = '';
 
@@ -48,24 +48,24 @@ export class OxStateChip extends OxEl {
 
   /** The resolved canonical state, or null when the value is unknown. */
   get resolvedState(): ActionState | null {
-    return resolveState(this.getAttribute('state'));
+    return resolveState(this._a('state'));
   }
 
   #label(key: ActionState | null, raw: string | null): string {
-    const s = this.getAttribute('seconds');
+    const s = this._a('seconds');
     if (key) return key == 'held' && s ? `Held · undo ${s} s` : ACTION_STATES[key].label;
     const t = slug(raw).replace(/_/g, ' ') || 'unknown';
     return t[0]!.toUpperCase() + t.slice(1);
   }
 
   protected _render() {
-    const raw = this.getAttribute('state');
+    const raw = this._a('state');
     const key = resolveState(raw);
     const def = key && ACTION_STATES[key];
-    const detail = this.getAttribute('detail');
-    const label = this.getAttribute('label') || this.#label(key, raw);
+    const detail = this._a('detail');
+    const label = this._a('label') || this.#label(key, raw);
     const text = detail ? `${label} · ${detail}` : label;
-    const reserve = (this.getAttribute('reserve') || '').trim();
+    const reserve = (this._a('reserve') || '').trim();
     const ghosts = (reserve == 'all' ? Object.keys(ACTION_STATES) : reserve ? reserve.split(/\s+/) : [])
       .map((k) => this.#label(resolveState(k), k))
       .filter((g) => g != text);

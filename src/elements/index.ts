@@ -14,8 +14,10 @@ import { OxStateChip } from './state-chip.js';
 import { ELEMENTS, defineElements } from './define.js';
 
 export { OxAttentionLine, OxAvatar, OxFooter, OxGlyph, OxReceiptRow, OxStateChip };
-export { ACTION_STATES, STATE_ALIASES, FOOTER_FRAMES, FOOTER_VARIANTS, resolveState, resolveFooter } from './states.js';
-export type { ActionState, StateDef, FooterVariant, FooterFrame } from './states.js';
+export { ACTION_STATES, STATE_ALIASES, resolveState } from './states.js';
+export type { ActionState, StateDef } from './states.js';
+export { FOOTER_FRAMES, FOOTER_VARIANTS, resolveFooter } from './frames.js';
+export type { FooterVariant, FooterFrame } from './frames.js';
 export { GLYPHS, GLYPH_KINDS, glyphSvg } from './glyph.js';
 export type { GlyphKind } from './glyph.js';
 export { RECEIPT_STATUSES, resolveReceiptStatus } from './receipt-row.js';

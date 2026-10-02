@@ -26,7 +26,7 @@ const CSS = `
  * truncating), "action" (e.g. a refresh button).
  */
 export class OxAttentionLine extends OxEl {
-  static observedAttributes = ['tone', 'count', 'oldest', 'blocks', 'label'];
+  static observedAttributes = 'tone count oldest blocks label'.split(' ');
 
   #custom = false;
 
@@ -49,18 +49,18 @@ export class OxAttentionLine extends OxEl {
 
   /** needs-you | blocking | calm, after "count=0 is calm". */
   get effectiveTone(): 'needs-you' | 'blocking' | 'calm' {
-    const t = this.getAttribute('tone');
-    return t == 'calm' || this.getAttribute('count') == '0' ? 'calm' : t == 'blocking' ? 'blocking' : 'needs-you';
+    const t = this._a('tone');
+    return t == 'calm' || this._a('count') == '0' ? 'calm' : t == 'blocking' ? 'blocking' : 'needs-you';
   }
 
   /** The sentence the line reads, also its accessible name. */
   get sentence(): string {
     const tone = this.effectiveTone;
-    const n = Math.max(1, Math.round(+this.getAttribute('count')! || 1));
-    const b = this.getAttribute('blocks');
-    const oldest = this.getAttribute('oldest');
+    const n = Math.max(1, Math.round(+this._a('count')! || 1));
+    const b = this._a('blocks');
+    const oldest = this._a('oldest');
     return (
-      this.getAttribute('label') ||
+      this._a('label') ||
       (tone == 'calm'
         ? 'Nothing needs your decision.'
         : [
