@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OrgX elements</title>
+<!--
+  Gallery of every framework-free element in every state.
+  Build first (npm run build), then open this file or serve the repo root.
+  Query params: ?theme=light|dark (default follows the OS),
+                ?avatars=<base url for <agent>-<form>-<size>.webp renders>
+-->
+<link rel="stylesheet" href="../dist/tokens.css">
+<script>
+  (function () {
+    var q = new URLSearchParams(location.search);
+    var t = q.get('theme');
+    if (t) document.documentElement.setAttribute('data-theme', t);
+  })();
+</script>
+<script src="../dist/elements.iife.js"></script>
+<style>
+  *{box-sizing:border-box}
+  html{background:var(--ox-bg)}
+  body{margin:0;background:var(--ox-bg);color:var(--ox-text);font-family:var(--ox-font);-webkit-font-smoothing:antialiased}
+  main{max-width:1240px;margin:0 auto;padding:32px 16px 64px;display:flex;flex-direction:column;gap:40px}
+  header{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap}
+  h1{margin:6px 0 0;font-size:28px;line-height:1.15;font-weight:700;letter-spacing:-.025em;text-wrap:balance}
+  h2{margin:0;font-size:17px;font-weight:650;letter-spacing:-.015em}
+  .lbl{font:600 10.5px/1.2 var(--ox-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--ox-text-muted)}
+  .sub{font-size:13px;line-height:1.5;color:var(--ox-text-2);max-width:620px;margin:6px 0 0}
+  .sp{flex:1}
+  section{display:flex;flex-direction:column;gap:14px}
+  .sec-hd{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+  .sec-hd .meta{font:500 11.5px/1.3 var(--ox-mono);color:var(--ox-text-muted)}
+  .card{position:relative;background:var(--ox-panel);border:1px solid var(--ox-border);border-radius:16px;box-shadow:var(--ox-shadow);overflow:hidden}
+  .card::after{content:"";position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(var(--edge,var(--ox-edge-mute-rgb)),.7),transparent)}
+  .card.amber,.card:has(ox-footer[data-tone=amber]){--edge:var(--ox-edge-amber-rgb)}
+  .card.teal,.card:has(ox-footer[data-tone=teal]){--edge:var(--ox-edge-teal-rgb)}
+  .card.red,.card:has(ox-footer[data-tone=red]){--edge:var(--ox-edge-red-rgb)}
+  .card.mute,.card:has(ox-footer[data-tone=mute]){--edge:var(--ox-edge-mute-rgb)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,360px),1fr));gap:12px 14px}
+  .cap{font:500 11px/1.3 var(--ox-mono);color:var(--ox-text-muted);margin-top:6px;padding-left:2px}
+  .frame{min-width:0}
+  .variant{display:grid;grid-template-columns:200px minmax(0,1fr);gap:16px;padding:18px 0;border-top:1px solid var(--ox-border)}
+  .variant:first-of-type{border-top:0}
+  .variant .who{display:flex;flex-direction:column;gap:4px}
+  .variant .who b{font-size:15px}
+  .chips{display:grid;grid-template-columns:repeat(auto-fill,minmax(176px,1fr));gap:14px 12px}
+  .chips .it{display:flex;flex-direction:column;gap:6px;align-items:flex-start;min-width:0}
+  .stack{display:flex;flex-direction:column;gap:12px}
+  .rows{padding:6px 18px}
+  .glyphs{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+  .glyph{padding:14px;display:flex;flex-direction:column;gap:10px}
+  .ramp{display:flex;align-items:flex-end;gap:10px}
+  .gname{font-size:13.5px;font-weight:650}
+  .avs{display:grid;grid-template-columns:110px repeat(6,minmax(0,1fr));gap:10px 8px;align-items:center}
+  .avs .h{font:600 10.5px/1.2 var(--ox-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ox-text-muted);text-align:center}
+  .avs .n{display:flex;flex-direction:column;gap:2px}
+  .avs .n b{font-size:13.5px}
+  .avs .n span{font:500 11px/1.2 var(--ox-mono);color:var(--ox-text-muted)}
+  .avs ox-avatar{justify-self:center}
+  .sizes{display:flex;align-items:flex-end;gap:20px;flex-wrap:wrap;padding:18px}
+  .sizes .it{display:flex;flex-direction:column;align-items:center;gap:8px}
+  .icon-btn{width:44px;height:44px;display:grid;place-items:center;border:0;background:none;color:var(--ox-text-muted);border-radius:10px;cursor:pointer}
+  .icon-btn:hover{color:var(--ox-text);background:var(--ox-hover)}
+  .icon-btn:focus-visible{outline:2px solid var(--ox-focus);outline-offset:2px}
+  .theme-btn{min-height:36px;padding:0 12px;border-radius:9px;border:1px solid var(--ox-border-strong);background:none;color:var(--ox-text-2);font:inherit;font-size:12.5px;font-weight:650;cursor:pointer}
+  .theme-btn:focus-visible{outline:2px solid var(--ox-focus);outline-offset:2px}
+  ox-footer.frozen::part(fill){transform:scaleX(.62);transition:none}
+  @media (max-width:720px){
+    .variant{grid-template-columns:minmax(0,1fr);gap:10px}
+    .avs{grid-template-columns:52px repeat(6,minmax(0,1fr));gap:8px 2px}
+    .avs .n span{display:none}
+    .avs .h{font-size:9px;letter-spacing:0}
+    .avs .h::after{content:attr(data-short)}
+    .avs .h span{display:none}
+    .sizes{gap:14px;padding:16px}
+    h1{font-size:23px}
+  }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div>
+      <span class="lbl">@useorgx/orgx-ui-kit · elements</span>
+      <h1>Every element, every state</h1>
+      <p class="sub">Framework-free custom elements, themed only by <code>--ox-*</code> tokens. Quiet when fine, amber when it needs you, teal when accepted or moving, red when it failed and can be retried.</p>
+    </div>
+    <span class="sp"></span>
+    <button class="theme-btn" id="theme" type="button">Switch theme</button>
+  </header>
+
+  <section aria-labelledby="s-attn">
+    <div class="sec-hd"><h2 id="s-attn">Attention line</h2><span class="meta">needs-you · blocking · calm</span></div>
+    <div class="stack" id="attn"></div>
+  </section>
+
+  <section aria-labelledby="s-chip">
+    <div class="sec-hd"><h2 id="s-chip">State chip</h2><span class="meta">SM0 lifecycle + SM2 columns · label / stored key</span></div>
+    <div class="chips" id="chips"></div>
+  </section>
+
+  <section aria-labelledby="s-receipt">
+    <div class="sec-hd"><h2 id="s-receipt">Receipt rows</h2><span class="meta">met · fail · your call · unverified · checking · link</span></div>
+    <div class="card amber"><div class="rows" id="receipts" role="list" aria-label="Checkout latency fix · 46 criteria"></div></div>
+  </section>
+
+  <section aria-labelledby="s-footer">
+    <div class="sec-hd"><h2 id="s-footer">Footers</h2><span class="meta">SM3 · four footers, six states, one 64 px row</span></div>
+    <div id="footers"></div>
+  </section>
+
+  <section aria-labelledby="s-glyph">
+    <div class="sec-hd"><h2 id="s-glyph">Glyphs</h2><span class="meta">G1 · muted by default, amber needs you, teal accepted</span></div>
+    <div class="glyphs" id="glyphs"></div>
+  </section>
+
+  <section aria-labelledby="s-avatar">
+    <div class="sec-hd"><h2 id="s-avatar">Avatars</h2><span class="meta">7 agents × 6 forms · hue ring · initial when the render is missing</span></div>
+    <div class="card"><div class="sizes" id="sizes"></div></div>
+    <div class="card" style="padding:16px"><div class="avs" id="avatars"></div></div>
+  </section>
+</main>
+
+<script>
+(function () {
+  var q = new URLSearchParams(location.search);
+  var AV = q.get('avatars') || 'https://mcp.useorgx.com/widgets/shared/avatars';
+  function h(html) { var t = document.createElement('template'); t.innerHTML = html.trim(); return t.content; }
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return '&#' + c.charCodeAt(0) + ';'; }); }
+  var REFRESH = '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13.5 8a5.5 5.5 0 11-1.6-3.9"/><path d="M13.5 2.5v3h-3"/></svg>';
+
+  document.getElementById('theme').onclick = function () {
+    var root = document.documentElement;
+    var dark = root.getAttribute('data-theme') ? root.getAttribute('data-theme') === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+    root.setAttribute('data-theme', dark ? 'light' : 'dark');
+  };
+
+  // Attention line
+  var attn = [
+    ['amber', 'tone="needs-you" count="2" oldest="2d"'],
+    ['red', 'tone="blocking" count="1" blocks="3" oldest="5h"'],
+    ['teal', 'tone="calm"'],
+  ];
+  attn.forEach(function (a) {
+    document.getElementById('attn').append(h('<div class="frame"><div class="card ' + a[0] + '"><ox-attention-line ' + a[1] + '><span slot="meta">Acme · synced 14:02</span><button slot="action" class="icon-btn" aria-label="Refresh">' + REFRESH + '</button></ox-attention-line></div><div class="cap">' + esc(a[1]) + '</div></div>'));
+  });
+
+  // State chips
+  var S = OrgXElements.ELEMENTS['ox-state-chip'];
+  var states = ['needs_you','sending','held','committed','queued','running','verifying','succeeded','undone','cancelled','paused_for_input','failed','retrying','failed_step','partially_succeeded','draft','handed_off','confirmed','rejected','expired','superseded','stale','offline','view_only','blocked','delivered'];
+  var details = { running: 'step 3 of 5', retrying: '2 of 3', partially_succeeded: '2 of 3' };
+  states.forEach(function (s) {
+    var extra = s === 'held' ? ' seconds="10"' : details[s] ? ' detail="' + details[s] + '"' : '';
+    document.getElementById('chips').append(h('<div class="it"><ox-state-chip state="' + s + '"' + extra + '></ox-state-chip><span class="cap">' + s + '</span></div>'));
+  });
+  document.getElementById('chips').append(h('<div class="it"><ox-state-chip state="running" reserve="running succeeded failed partially_succeeded"></ox-state-chip><span class="cap">reserve: no reflow</span></div>'));
+
+  // Receipt rows (K1 receipt + F1 evidence)
+  var rows = [
+    ['fail', 'Retries are bounded on a provider timeout', 'Reliability · Judged · unbounded loop', '0.81 · bar 0.85', ''],
+    ['fail', 'Runbook covers the new retry behavior', 'Docs · Judged · runbook not updated', '0.62', ''],
+    ['yours', 'Ship on by default, or behind the flag?', 'Compatibility · Your call · canary suggested', '', ''],
+    ['unverified', 'Timeout retry path is exercised', 'Reliability · Observed · never hit in staging', '', ''],
+    ['pending', 'Load test at 2× peak', 'Performance · Measured · judging', 'started 14:06', ''],
+    ['met', 'CI run 1182 · passed', '', '2d ago', 'https://useorgx.com/'],
+    ['met', 'Rollback plan · v3', '', '3d ago', 'https://useorgx.com/'],
+  ];
+  rows.forEach(function (r) {
+    document.getElementById('receipts').append(h('<ox-receipt-row status="' + r[0] + '" label="' + esc(r[1]) + '"' + (r[2] ? ' detail="' + esc(r[2]) + '"' : '') + (r[3] ? ' value="' + esc(r[3]) + '"' : '') + (r[4] ? ' href="' + r[4] + '"' : '') + '></ox-receipt-row>'));
+  });
+  document.getElementById('receipts').addEventListener('ox-open', function (e) { e.preventDefault(); });
+
+  // Footers: SM3 copy, frame by frame
+  var now = Date.now();
+  var F = [
+    ['finishes-here', 'Finishes here', 'Questions, inline review, batch, request changes', [
+      ['needs-you', 'Finishes here', 'undo 10 s', 'Send', '', 'Needs you'],
+      ['sending', 'Sending', 'your answers', 'Sending…', '', 'Sending'],
+      ['held', 'Saved', 'resuming in {s} s', '', 'Undo', 'Held · undo'],
+      ['running', 'Eli is running', 'step 3 of 5', '', 'Watch ↗', 'Running'],
+      ['done', 'Done · 4m', '2 checks passed', '', 'Receipt ↗', 'Done'],
+      ['failed', 'Not sent', 'answers kept', 'Retry', '', 'Failed'],
+    ]],
+    ['confirms-in-orgx', 'Confirms in OrgX', 'Branching decision, over the cap, accept', [
+      ['needs-you', 'Confirms in OrgX', 'production', 'Save draft', '', 'Needs you'],
+      ['saving', 'Saving draft', 'canary', 'Saving…', '', 'Saving'],
+      ['draft', 'Draft saved', 'not applied yet', 'Confirm in OrgX ↗', '', 'Draft'],
+      ['waiting', 'Opened in OrgX', '14:06', '', 'Check now', 'Waiting'],
+      ['confirmed', 'Confirmed by you', 'canary · 14:12', '', 'Receipt ↗', 'Confirmed'],
+      ['rejected', 'Rejected by you', 'Eli reworks it', '', 'Receipt ↗', 'Rejected'],
+    ]],
+    ['queues-work', 'Queues agent work', 'Pick within a cap, race, ask to verify', [
+      ['needs-you', 'Queue 3 for Xandy', 'est. $70 · undo 10 s', 'Queue 3', '', 'Needs you'],
+      ['held', 'Queued 3', 'undo {s} s', '', 'Undo', 'Held · undo'],
+      ['queued', '2 runs ahead', 'about 1 min', '', 'Cancel', 'Queued'],
+      ['running', '1 of 3 done', '$22 spent', '', 'Watch ↗', 'Running'],
+      ['partial', '2 of 3 started', '1 over the cap', 'Confirm in OrgX ↗', '', 'Partly done'],
+      ['done', '3 done', '$64 of est. $70', '', 'Receipt ↗', 'Done'],
+    ]],
+    ['reads', 'Reads and refreshes', 'Digest, receipt, explorer, goals', [
+      ['loading', '', '', '', '', 'Loading'],
+      ['fresh', 'Synced 2m ago', '46 criteria', '', 'Open ↗', 'Fresh'],
+      ['stale', 'As of 13:44', 'v4 may have landed', '', 'Refresh', 'Stale'],
+      ['refreshing', 'Refreshing', 'keeps what you see', '', '', 'Refreshing'],
+      ['failed', 'Couldn’t refresh', 'showing 13:44', '', 'Retry', 'Failed'],
+      ['caught-up', 'Nothing waits on you', '4 done overnight', '', '', 'Caught up'],
+    ]],
+  ];
+  F.forEach(function (v) {
+    var frames = v[3].map(function (f, i) {
+      var a = 'variant="' + v[0] + '" state="' + f[0] + '"' + (f[1] ? ' heading="' + esc(f[1]) + '"' : '') + (f[2] ? ' detail="' + esc(f[2]) + '"' : '') +
+        (f[3] ? ' primary-label="' + esc(f[3]) + '"' : '') + (f[4] ? ' action-label="' + esc(f[4]) + '"' : '') +
+        (f[0] === 'held' ? ' undo-deadline="' + (now + 8500) + '" undo-seconds="10"' : '');
+      return '<div class="frame"><div class="card"><ox-footer flush ' + a + '></ox-footer></div><div class="cap">' + (i + 1) + ' · ' + f[5] + '</div></div>';
+    }).join('');
+    document.getElementById('footers').append(h('<div class="variant"><div class="who"><b>' + v[1] + '</b><span class="cap" style="margin:0">' + v[2] + '</span></div><div class="grid">' + frames + '</div></div>'));
+  });
+  // Hold to confirm (P7-C): resting, and mid-hold.
+  document.getElementById('footers').append(h(
+    '<div class="variant"><div class="who"><b>Hold to confirm</b><span class="cap" style="margin:0">Pointer or Space/Enter held for 1 s; a click alone never sends</span></div><div class="grid">' +
+    '<div class="frame"><div class="card"><ox-footer flush variant="finishes-here" state="needs-you" heading="Checked against version 7" detail="Smoke test on staging" primary-label="Hold to send" hold></ox-footer></div><div class="cap">Resting</div></div>' +
+    '<div class="frame"><div class="card"><ox-footer id="holding" class="frozen" flush variant="finishes-here" state="needs-you" heading="Checked against version 12" detail="Canary 10% for 24h, then full" primary-label="Hold to send" hold hold-ms="600000"></ox-footer></div><div class="cap">Holding · 62%</div></div>' +
+    '<div class="frame"><div class="card"><ox-footer flush variant="finishes-here" state="needs-you" heading="View only" detail="Priya decides · Eli recommends canary" primary-label="Send" disabled></ox-footer></div><div class="cap">View only (disabled)</div></div>' +
+    '</div></div>'));
+  var holdBtn = document.getElementById('holding').shadowRoot.querySelector('button.p');
+  holdBtn.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, button: 0, pointerId: 1 }));
+
+  // Glyphs
+  ['goal','initiative','workstream','milestone','task','run','decision','question','artifact','receipt'].forEach(function (k) {
+    document.getElementById('glyphs').append(h('<div class="card glyph"><div class="ramp"><ox-glyph kind="' + k + '" size="32" tone="text" label="auto"></ox-glyph><ox-glyph kind="' + k + '" size="14"></ox-glyph><ox-glyph kind="' + k + '" size="18"></ox-glyph><ox-glyph kind="' + k + '" size="24" tone="amber"></ox-glyph><ox-glyph kind="' + k + '" size="24" tone="teal"></ox-glyph></div><span class="gname">' + k[0].toUpperCase() + k.slice(1) + '</span></div>'));
+  });
+
+  // Avatars
+  var agents = [['pace','Product'],['eli','Engineering'],['mark','Marketing'],['sage','Sales'],['orion','Operations'],['dana','Design'],['xandy','Orchestrator']];
+  var forms = ['base','strategic','proactive','working','asking','verifying'];
+  var narrow = innerWidth < 720;
+  var avSize = narrow ? 36 : 48;
+  var grid = '<span></span>' + forms.map(function (f) { return '<span class="h" data-short="' + f.slice(0, 5) + '"><span>' + f + '</span></span>'; }).join('');
+  agents.forEach(function (a) {
+    grid += '<div class="n"><b>' + a[0][0].toUpperCase() + a[0].slice(1) + '</b><span>' + a[1] + '</span></div>' +
+      forms.map(function (f) { return '<ox-avatar agent="' + a[0] + '" form="' + f + '" size="' + avSize + '" base-url="' + AV + '"></ox-avatar>'; }).join('');
+  });
+  document.getElementById('avatars').append(h(grid));
+  document.getElementById('sizes').append(h(
+    [48, 96, 192].map(function (s) { return '<div class="it"><ox-avatar agent="eli" form="working" size="' + s + '" base-url="' + AV + '"></ox-avatar><span class="cap">' + s + ' · eli-working-' + s + '.webp</span></div>'; }).join('') +
+    '<div class="it"><ox-avatar agent="mark" form="asking" size="96" base-url="https://invalid.example/none"></ox-avatar><span class="cap">96 · fallback initial</span></div>' +
+    '<div class="it"><ox-avatar agent="sage" form="verifying" size="48" base-url="https://invalid.example/none"></ox-avatar><span class="cap">48 · fallback</span></div>'
+  ));
+})();
+</script>
+</body>
+</html>
