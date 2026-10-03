@@ -1,3 +1,4 @@
+import { OxAgentCard } from './agent-card.js';
 import { OxAttentionLine } from './attention-line.js';
 import { OxAvatar } from './avatar.js';
 import { OxFooter } from './footer.js';
@@ -13,6 +14,7 @@ export const ELEMENTS = {
   'ox-footer': OxFooter,
   'ox-glyph': OxGlyph,
   'ox-avatar': OxAvatar,
+  'ox-agent-card': OxAgentCard,
 } as const;
 
 /** Define every element. Idempotent: a second call, or a second copy of the kit, is a no-op. */

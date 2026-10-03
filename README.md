@@ -49,7 +49,7 @@ Inline both files into the widget HTML so it renders with no network round-trip:
 
 ### Only what the widget uses
 
-`elements.iife.js` defines all six elements. A widget that uses a few can inline the split bundles instead: `elements-core.iife.js` first (the shared runtime plus `<ox-state-chip>`, `<ox-attention-line>` and `<ox-receipt-row>`), then any of `elements-footer.iife.js`, `elements-glyph.iife.js` and `elements-avatar.iife.js`. The add-ons reuse the core runtime from `window.OrgXElements`, so an add-on loaded without core throws `load elements-core.iife.js (or elements.iife.js) before ...`. Every bundle registers idempotently and the first copy wins (constructors, runtime, `avatarConfig`), so loading one twice, or the full bundle next to the split ones, is a no-op. Take all of them from the same build.
+`elements.iife.js` defines all seven elements. A widget that uses a few can inline the split bundles instead: `elements-core.iife.js` first (the shared runtime plus `<ox-state-chip>`, `<ox-attention-line>` and `<ox-receipt-row>`), then any of `elements-footer.iife.js`, `elements-glyph.iife.js` and `elements-avatar.iife.js`. The add-ons reuse the core runtime from `window.OrgXElements`, so an add-on loaded without core throws `load elements-core.iife.js (or elements.iife.js) before ...`. Every bundle registers idempotently and the first copy wins (constructors, runtime, `avatarConfig`), so loading one twice, or the full bundle next to the split ones, is a no-op. Take all of them from the same build.
 
 ```html
 <script>/* elements-core.iife.js */</script>
@@ -59,11 +59,11 @@ Inline both files into the widget HTML so it renders with no network round-trip:
 
 | bundle | elements | min | gzip | budget (build fails above) |
 | --- | --- | --- | --- | --- |
-| `elements.iife.js` | all six | 24.9 KB | 10.4 KB | 26 KB (warns above 25 KB) |
+| `elements.iife.js` | all seven | 32.3 KB | 12.9 KB | 34 KB (warns above 33 KB) |
 | `elements-core.iife.js` | runtime, `ox-state-chip`, `ox-attention-line`, `ox-receipt-row` | 11.3 KB | 5.3 KB | 12 KB |
 | `elements-footer.iife.js` | `ox-footer` | 9.8 KB | 4.5 KB | 10.5 KB |
 | `elements-glyph.iife.js` | `ox-glyph` | 2.5 KB | 1.2 KB | 3 KB |
-| `elements-avatar.iife.js` | `ox-avatar` | 2.2 KB | 1.3 KB | 3 KB |
+| `elements-avatar.iife.js` | `ox-avatar`, `ox-agent-card` | 9.5 KB | 4.4 KB | 10 KB |
 
 The budgets live in `scripts/build-bundles.mjs`; `npm run build` prints every size. To keep the inlined bytes down, the build minifies each element stylesheet and abbreviates common CSS words with the dictionary in `src/elements/shared.ts` (expanded once per stylesheet at runtime), and drops the quotes around plain markup attribute values in the IIFEs; the DOM and CSS the browser gets are unchanged.
 
@@ -170,11 +170,23 @@ The four footers from SM3. One 64 px row in every state: status icon, two lines 
 
 The G1 set: `goal`, `initiative`, `workstream`, `milestone`, `task`, `run`, `decision`, `question`, `artifact`, `receipt`. 24-unit grid, 1.8 stroke. `tone`: muted (default), `amber`, `teal`, `red`, `text`, `current`. Decorative unless `label` is set (`label="auto"` reads the kind). `--ox-glyph-size` sizes every glyph in a container.
 
-### `<ox-avatar agent form size base-url>`
+### `<ox-avatar agent name size variant form base-url>`
 
-Renders `${baseUrl}/${agent}-${form}-${size}.webp` in a circle with the agent's hue ring, plus a 2x `srcset` when a larger render exists. Alt text is "Eli, working" (the base form reads "Eli"). If the image fails, the agent's initial takes its place in the same footprint and `ox-avatar-fallback` fires.
+Photo mode is the default: the agent's original headshot, `${photoBaseUrl}/${agent}-${size}.webp`, in a circle with the agent's hue ring, plus a 2x `srcset` when a larger image exists. `agent` takes a key (`eli`), a domain (`engineering`), an id (`engineering-agent`) or a headshot stem (`engineering_autopilot`); `resolveAgent()` exposes the same matching. Fallbacks never leave an empty circle: `agent="system"` / `orgx` / `automation`, or no agent and no name, shows the OrgX mark; a `name` that is not an agent shows its initials on a neutral ring. If an image fails, the agent's initial takes its place in the same footprint and `ox-avatar-fallback` fires.
 
-## Avatar renders
+`variant="render"` (or `avatarConfig.variant = 'render'`) brings back the animated set, `${baseUrl}/${agent}-${form}-${size}.webp`, with alt text such as "Eli, working". It is on hold; `form` is still recorded (`data-form`) in photo mode.
+
+### `<ox-agent-card agent name role state status-label detail task href size>`
+
+An avatar that reveals who the agent is. The trigger is a `<button aria-expanded>` holding an `<ox-avatar>` (agent, name, size, variant, base-url pass through) plus any slotted label. The card shows the name, `role` (default: the agent's domain), the state as an `<ox-state-chip>` (`status-label` overrides its wording, `detail` sits beside it), the current `task`, and "Open in OrgX" (`href`, http(s) or relative only). Missing fields are omitted.
+
+It opens on hover (140 ms), keyboard focus and tap; Esc (focus returns to the trigger), a click outside or focus leaving closes it. It renders in the top layer where the browser supports `popover`, below the trigger or flipped above when there is more room, shifted to stay 8 px inside the viewport (the widget iframe). The link fires a cancelable `ox-open` event (`detail.href`) first so a widget can route it through the host; `ox-agent-card-toggle` reports `{ open }`. Reduced motion drops the pop-in.
+
+## Avatar images
+
+Photos: `<agent>-<48|96|192>.webp`, face-centred square crops of the original headshots, under `avatarConfig.photoBaseUrl` (default `https://mcp.useorgx.com/avatars/agents/photo`, generated by `scripts/generate-agent-photos.mjs` in orgx-mcp).
+
+Renders (variant="render", on hold):
 
 Agents: `pace` (Product, #14b8a6), `eli` (Engineering, #22c55e), `mark` (Marketing, #f97316), `sage` (Sales, #ec4899), `orion` (Operations, #84cc16), `dana` (Design, #a855f7), `xandy` (Orchestrator, #6366f1). Forms: `base`, `strategic`, `proactive`, `working`, `asking`, `verifying`.
 

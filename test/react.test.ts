@@ -28,7 +28,7 @@ describe('React wrappers', () => {
         createElement(OxAttentionLine, { tone: 'blocking', count: 2, blocks: 3, meta: 'Acme · synced 14:02' }),
         createElement(OxReceiptRow, { status: 'met', label: 'CI run 1182 · passed', value: '2d ago' }),
         createElement(OxGlyph, { kind: 'decision', tone: 'amber', label: 'auto' }),
-        createElement(OxAvatar, { agent: 'eli', form: 'working', size: 96, baseUrl: 'https://cdn.test/a' }),
+        createElement(OxAvatar, { agent: 'eli', form: 'working', variant: 'render', size: 96, baseUrl: 'https://cdn.test/a' }),
         createElement(OxFooter, { variant: 'queues-work', state: 'needs-you', primaryLabel: 'Queue 3', hold: true, holdMs: 600 }),
       ),
     );
