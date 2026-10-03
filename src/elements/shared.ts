@@ -189,6 +189,12 @@ export const SOLID = 'fill="currentColor" stroke="none"';
 /** The G1 question glyph (inner markup), shared by <ox-glyph> and <ox-receipt-row>. */
 export const QUESTION = `<path d="M4 6.5A3.5 3.5 0 0 1 7.5 3h9A3.5 3.5 0 0 1 20 6.5v6a3.5 3.5 0 0 1-3.5 3.5H11l-4.5 4v-4A3.5 3.5 0 0 1 4 12.5z" ${FIELD}/><path d="M9.6 8.2a2.5 2.5 0 0 1 4.8.8c0 1.6-2.4 1.9-2.4 3.2"/><circle cx="12" cy="14.6" r="1.1" ${SOLID}/>`;
 
+/**
+ * The G1 person glyph ("needs you"): a head and shoulders on a tinted body.
+ * Shared by <ox-glyph kind="person"> and the receipt row's "your call" mark.
+ */
+export const PERSON = `<circle cx="12" cy="7.6" r="3.6" ${FIELD}/><circle cx="12" cy="7.6" r="3.6"/><path d="M4.8 20.2c.7-3.7 3.6-6 7.2-6s6.5 2.3 7.2 6z" fill="currentColor" fill-opacity=".1"/>`;
+
 /* --------------------------------------------------------------- styles -- */
 /** Base CSS adopted by every element: type, focus ring, tones, reduced motion. */
 export const BASE_CSS = `

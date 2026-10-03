@@ -8,7 +8,7 @@ const icon = (k: FooterFrame['icon']): string =>
 
 const CSS = `
 :host{display:block;min-width:0}
-.f{display:flex;align-items:center;gap:10px;min-height:64px;padding:10px 14px 10px 18px;border-top:1px solid var(--ox-border)}
+.f{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;min-height:64px;padding:10px 14px 10px 18px;border-top:1px solid var(--ox-border)}
 :host([flush]) .f{border-top:0}
 .i{width:22px;height:22px;display:grid;place-items:center;flex:none;color:var(--ox-text-muted)}
 [data-k=seal],[data-k=check]{color:var(--ox-teal)}
@@ -19,20 +19,21 @@ const CSS = `
 .i .spin{width:18px;height:18px}
 .arc{animation:ox-drain var(--u) linear var(--ud) forwards}
 @keyframes ox-drain{to{stroke-dashoffset:53.4}}
-.t{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1;font-size:13.5px;line-height:1.25}
+.t{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1 1 0;font-size:13.5px;line-height:1.25}
+.s .t{flex-basis:calc(100% - 32px)}
 .n{animation:ox-fade .12s}
 .h{font-weight:600}
 [data-tone=red] .h{color:var(--ox-danger)}
 .d{font-size:12.5px;color:var(--ox-text-muted);font-variant-numeric:tabular-nums}
-.h,.d{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.h,.d{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;overflow-wrap:anywhere}
 .h:empty,.d:empty{display:none}
 .k{display:block;height:8px;width:110px;border-radius:4px;background:var(--ox-skeleton)}
 .d .k{width:70px;margin-top:4px}
 .a,.g{display:grid;justify-items:end;align-items:center}
-.a{max-width:62%}
+.a{flex:none;max-width:100%;margin-left:auto}
 .a>*,.g>*{grid-area:1/1}
 .g{visibility:hidden}
-.v{display:flex;gap:6px}
+.v{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px 6px}
 .b{position:relative;min-height:36px;border-radius:9px;padding:0 12px;display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:650;border:1px solid transparent;background:none;color:var(--ox-text-2);white-space:nowrap;cursor:pointer;transition:background .16s}
 .b::after{content:"";position:absolute;inset:-4px -2px}
 .b[hidden]{display:none}
@@ -61,7 +62,11 @@ const clean = (t: string) => t.replace(/\s*↗$/, '');
  * SM3: four footers cover every widget. The same 64 px row in every state:
  * status icon, two lines of text (what happened · what it means), at most one
  * text action and one primary. The action area reserves the width of every
- * label it shows, so the row never reflows as the state moves. The primary is
+ * label it shows, so the row never reflows as the state moves. The heading
+ * and detail wrap to two lines beside the actions; when either would need
+ * more (phones), the text takes the row and the actions move below it,
+ * right-aligned, wrapping again if they still don't fit. Actions are never
+ * clipped. The primary is
  * the action lime (--ox-action, --ox-action-fg) in every widget; the needs-you
  * amber stays on the status icon and the card edge.
  *
@@ -137,6 +142,17 @@ export class OxFooter extends OxEl {
     p.onkeyup = (e) => {
       if (isHold() && e.key == this.#holdKey) (e.preventDefault(), end());
     };
+    if (typeof ResizeObserver != 'undefined') new ResizeObserver(() => this.#fit()).observe(this);
+  }
+
+  /** Side by side while heading and detail fit in two lines each; else stack (class "s"). */
+  #fit() {
+    const c = this._q('.f').classList;
+    const over = (e: Element) => e.scrollHeight > e.clientHeight + 1;
+    c.remove('s');
+    const w = this._q('.t').clientWidth;
+    // w is 0 before layout (hidden, or no layout engine): decide on the next resize.
+    if (w && (w < 64 || over(this._q('.h')) || over(this._q('.d')))) c.add('s');
   }
 
   disconnectedCallback() {
@@ -228,6 +244,7 @@ export class OxFooter extends OxEl {
     else if (was != 'held' || changed || this.#restart) this.#startUndo();
     if (skel) this._q('.d').innerHTML = '<i class="k"></i>';
     else this.#renderDetail();
+    if (this.isConnected) this.#fit();
 
     // SM5: when the state moves under focus (e.g. to Failed), focus moves to the new control.
     if (changed && focused) (p.hidden ? this.#x : p).focus();

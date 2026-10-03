@@ -3,7 +3,7 @@ import { ICON, OxEl, esc, ring, slug } from './shared.js';
 
 const CSS = `
 :host{display:inline-flex;vertical-align:middle;max-width:100%}
-.c{display:inline-flex;align-items:center;gap:6px;height:22px;max-width:100%;padding:0 8px 0 7px;border-radius:999px;font:600 11px/1 var(--ox-mono);white-space:nowrap;color:var(--tone);background:rgba(var(--tone-rgb),.07);border:1px solid rgba(var(--tone-rgb),.3);transition:color .3s,background .3s,border-color .3s}
+.c{display:inline-flex;align-items:center;gap:6px;height:22px;max-width:100%;padding:0 8px 0 7px;border-radius:999px;font:600 11.5px/1 var(--ox-font);white-space:nowrap;color:var(--tone);background:rgba(var(--tone-rgb),.07);border:1px solid rgba(var(--tone-rgb),.3);transition:color .3s,background .3s,border-color .3s}
 [data-tone=ink]{background:var(--ox-hover);border-color:var(--ox-border-strong)}
 [data-tone=mute]{background:none;border-color:var(--ox-border-strong)}
 .i{width:12px;height:12px;display:grid;place-items:center;flex:none}
@@ -14,6 +14,7 @@ const CSS = `
 .l{display:grid;min-width:0}
 .l>span{grid-area:1/1;overflow:hidden;text-overflow:ellipsis}
 .g{visibility:hidden}
+@media (max-width:480px){.g{display:none}}
 .n{animation:ox-fade .12s}
 `;
 
@@ -30,7 +31,9 @@ const CSS = `
  *   detail   appended after a middle dot: "Running · step 3 of 5"
  *   seconds  for state="held": "Held · undo 8 s"
  *   reserve  "all" or a space-separated list of states whose labels the chip
- *            reserves width for, so a row never reflows as the state moves
+ *            reserves width for, so a row never reflows as the state moves.
+ *            Ignored at phone widths (480 px and below), where the reserved
+ *            width costs the row's own text more than a reflow would.
  */
 export class OxStateChip extends OxEl {
   static observedAttributes = 'state label detail seconds reserve'.split(' ');

@@ -1,4 +1,4 @@
-import { FIELD, OxEl, QUESTION, SOLID, svg24 } from './shared.js';
+import { FIELD, OxEl, PERSON, QUESTION, SOLID, svg24 } from './shared.js';
 
 /*
  * G1 "One shape per kind of work": 24-point grid, 1.8 stroke, round caps.
@@ -17,8 +17,11 @@ const SRC = {
   milestone: '<path d="M5 3v18"/><path d="m5 4 12 1-2 4 2 4-12-1z" fill="currentColor" fill-opacity=".1"/>',
   task: '<rect x="4" y="4" width="16" height="16" rx="4" fill="currentColor" fill-opacity=".12" stroke="none"/><path d="M9 12.2 11 14.2 15.2 10"/>',
   run: '<circle cx="12" cy="12" r="9" ~/><path d="M10 8.5v7l5.5-3.5z" fill="currentColor"/>',
-  decision:
-    '<path d="M12 2.8 21.2 12 12 21.2 2.8 12z" ~/><path d="M12 17.5v-5"/><path d="M12 12.5 8.5 8.2"/><path d="M12 12.5l3.5-4.3"/><circle cx="8.5" cy="8.2" r="1.4" @/><circle cx="15.5" cy="8.2" r="1.4" @/>',
+  // The decision diamond, as the widgets' OrgXIcons draw it: a tinted diamond
+  // with its outline and a small fork inside (the outline keeps it a diamond,
+  // not a "Y", at 16 px).
+  decision: '<path d="M12 2.8 21.2 12 12 21.2 2.8 12z" fill="currentColor" fill-opacity=".1"/><path d="M12 16.5v-4M12 12.5 9 9M12 12.5 15 9"/>',
+  person: PERSON,
   question: QUESTION,
   artifact: '<path d="M6 3h8l4 4v14H6z" fill="currentColor" fill-opacity=".1"/><path d="M14 3v4h4"/><path d="M9 12h6M9 15.5h4"/>',
   receipt:
@@ -49,7 +52,7 @@ span{display:contents}
  * <ox-glyph kind="decision" tone="amber" size="18" label="Decision">
  *
  * kind: goal | initiative | workstream | milestone | task | run | decision |
- * question | artifact | receipt. tone: muted (default) | amber |
+ * person | question | artifact | receipt. tone: muted (default) | amber |
  * teal | red | text | current. Decorative unless `label` is set
  * (label="auto" reads the kind name). --ox-glyph-size sizes every glyph in a
  * container at once.

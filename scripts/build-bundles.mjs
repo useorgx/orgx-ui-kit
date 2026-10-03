@@ -31,9 +31,9 @@ const KB = 1024;
 const IIFES = {
   // 0.3.0-alpha.0: +7.3 KB for photo avatars (alias resolution, OrgX mark and
   // initials fallbacks) and the <ox-agent-card> hover card. Was 25.0 KB.
-  'elements.iife.js': ['iife.ts', 34 * KB, false], // 32.3 KB
-  'elements-core.iife.js': ['iife-core.ts', 12 * KB, false], // 11.3 KB
-  'elements-footer.iife.js': ['iife-footer.ts', 10.5 * KB, true], // 9.8 KB
+  'elements.iife.js': ['iife.ts', 34 * KB, false], // 33.0 KB
+  'elements-core.iife.js': ['iife-core.ts', 12 * KB, false], // 11.6 KB
+  'elements-footer.iife.js': ['iife-footer.ts', 10.5 * KB, true], // 10.3 KB
   'elements-glyph.iife.js': ['iife-glyph.ts', 3 * KB, true], // 2.5 KB
   'elements-avatar.iife.js': ['iife-avatar.ts', 10 * KB, true], // 9.4 KB: <ox-avatar> 3.6 + <ox-agent-card> 5.7 (was 2.2 KB)
 };

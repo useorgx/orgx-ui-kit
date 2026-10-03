@@ -59,11 +59,11 @@ Inline both files into the widget HTML so it renders with no network round-trip:
 
 | bundle | elements | min | gzip | budget (build fails above) |
 | --- | --- | --- | --- | --- |
-| `elements.iife.js` | all seven | 32.4 KB | 13.0 KB | 34 KB (warns above 33 KB) |
-| `elements-core.iife.js` | runtime, `ox-state-chip`, `ox-attention-line`, `ox-receipt-row` | 11.3 KB | 5.3 KB | 12 KB |
-| `elements-footer.iife.js` | `ox-footer` | 9.8 KB | 4.5 KB | 10.5 KB |
+| `elements.iife.js` | all seven | 33.0 KB | 13.2 KB | 34 KB (warns above 33 KB) |
+| `elements-core.iife.js` | runtime, `ox-state-chip`, `ox-attention-line`, `ox-receipt-row` | 11.6 KB | 5.4 KB | 12 KB |
+| `elements-footer.iife.js` | `ox-footer` | 10.3 KB | 4.7 KB | 10.5 KB |
 | `elements-glyph.iife.js` | `ox-glyph` | 2.5 KB | 1.2 KB | 3 KB |
-| `elements-avatar.iife.js` | `ox-avatar`, `ox-agent-card` | 9.5 KB | 4.4 KB | 10 KB |
+| `elements-avatar.iife.js` | `ox-avatar`, `ox-agent-card` | 9.6 KB | 4.5 KB | 10 KB |
 
 The budgets live in `scripts/build-bundles.mjs`; `npm run build` prints every size. To keep the inlined bytes down, the build minifies each element stylesheet and abbreviates common CSS words with the dictionary in `src/elements/shared.ts` (expanded once per stylesheet at runtime), and drops the quotes around plain markup attribute values in the IIFEs; the DOM and CSS the browser gets are unchanged.
 
@@ -108,7 +108,7 @@ All elements use shadow DOM with shared constructable stylesheets (a `<style>` f
 
 ### `<ox-state-chip state>`
 
-One pill for every action state (canvas SM0 lifecycle + SM2 columns). The chip shows the canvas wording, never the stored name. `role="status"`; the accessible name is the label.
+One pill for every action state (canvas SM0 lifecycle + SM2 columns). The chip shows the canvas wording, never the stored name, in the sans meta voice. `reserve` holds the width of other labels so a row doesn't reflow; at 480 px and below it is ignored and the chip takes its own width. `role="status"`; the accessible name is the label.
 
 | state | label | tone |
 | --- | --- | --- |
@@ -147,11 +147,11 @@ The one line that opens a surface. `needs-you` (amber): "2 need your decision ·
 
 ### `<ox-receipt-row status label value detail href>`
 
-One line of proof. `status`: `met` (teal check), `fail` (red alert), `yours` (amber question, "Your call"), `unverified` (muted hatch), `pending` (checking). The status is announced before the label. With `href` the row is a link that first dispatches a cancelable `ox-open` event (`detail.href`) so widgets can use `openWidgetLink`. Inside a `role="list"` parent it takes `role="listitem"`.
+One line of proof. `status`: `met` (teal check), `fail` (red alert), `yours` (amber person glyph, "Your call": it needs you), `unverified` (muted hatch), `pending` (checking). The status is announced before the label. With `href` the row is a link that first dispatches a cancelable `ox-open` event (`detail.href`) so widgets can use `openWidgetLink`. Inside a `role="list"` parent it takes `role="listitem"`.
 
 ### `<ox-footer variant state>`
 
-The four footers from SM3. One 64 px row in every state: status icon, two lines of text, at most one text action and one primary. The action area reserves the width of every label it will show, so the row never reflows.
+The four footers from SM3. One 64 px row in every state: status icon, two lines of text, at most one text action and one primary. The action area reserves the width of every label it will show, so the row never reflows. Heading and detail get two lines beside the actions; when either needs more (phones), the text takes the row and the actions move below it, right-aligned, wrapping again if needed, so nothing is clipped.
 
 | variant | states |
 | --- | --- |
@@ -168,7 +168,7 @@ The four footers from SM3. One 64 px row in every state: status icon, two lines 
 
 ### `<ox-glyph kind tone size label>`
 
-The G1 set: `goal`, `initiative`, `workstream`, `milestone`, `task`, `run`, `decision`, `question`, `artifact`, `receipt`. 24-unit grid, 1.8 stroke. `tone`: muted (default), `amber`, `teal`, `red`, `text`, `current`. Decorative unless `label` is set (`label="auto"` reads the kind). `--ox-glyph-size` sizes every glyph in a container.
+The G1 set: `goal`, `initiative`, `workstream`, `milestone`, `task`, `run`, `decision` (the outlined diamond), `person` (needs you), `question`, `artifact`, `receipt`. 24-unit grid, 1.8 stroke. `tone`: muted (default), `amber`, `teal`, `red`, `text`, `current`. Decorative unless `label` is set (`label="auto"` reads the kind). `--ox-glyph-size` sizes every glyph in a container.
 
 ### `<ox-avatar agent name size variant form base-url>`
 

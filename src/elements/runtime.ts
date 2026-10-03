@@ -5,6 +5,6 @@
  * these keys, so an add-on that needs another helper fails the build until it
  * is listed here.
  */
-import { FIELD, ICON, OxEl, QUESTION, SOLID, avatarConfig, emit, esc, install, ring, slug, svg24 } from './shared.js';
+import { FIELD, ICON, OxEl, PERSON, QUESTION, SOLID, avatarConfig, emit, esc, install, ring, slug, svg24 } from './shared.js';
 
-export const runtime = { OxEl, ICON, ring, emit, esc, slug, svg24, FIELD, SOLID, QUESTION, avatarConfig, install };
+export const runtime = { OxEl, ICON, ring, emit, esc, slug, svg24, FIELD, SOLID, QUESTION, PERSON, avatarConfig, install };

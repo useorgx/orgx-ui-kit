@@ -1,8 +1,9 @@
-import { ICON, OxEl, QUESTION, emit, esc, slug, svg24 } from './shared.js';
+import { ICON, OxEl, PERSON, emit, esc, slug, svg24 } from './shared.js';
 
 /**
  * Receipt row statuses, from the K1/K4 receipt cards and the F1 evidence rows:
- * met (teal check), fail (red alert), yours (amber question: "Your call"),
+ * met (teal check), fail (red alert), yours (amber person: "Your call", it
+ * needs you),
  * unverified (muted hatch), pending (still judging).
  */
 export const RECEIPT_STATUSES = {
@@ -31,13 +32,14 @@ a.r:hover .b{text-decoration:underline;text-decoration-color:var(--ox-border-str
 a.r:focus-visible{outline-offset:-2px;border-radius:8px}
 .i,.x{height:20px;display:grid;place-items:center}
 .i svg{width:15px;height:15px}
+.i.yours svg{width:18px;height:18px}
 .met{color:var(--ox-teal)}.fail{color:var(--ox-danger)}.yours{color:var(--ox-warning)}.unverified,.pending,.x{color:var(--ox-text-muted)}
 .h{width:10px;height:10px;border-radius:3px;background:repeating-linear-gradient(135deg,currentColor 0 2px,transparent 2px 4px)}
 .i .spin{width:12px;height:12px;border-width:1.6px}
 .t{display:flex;flex-direction:column;gap:2px;min-width:0;padding-top:1px}
 .b{font-size:13.5px;line-height:1.4;color:var(--ox-text);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
 .d{font-size:12px;line-height:1.35;color:var(--ox-text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.v{font:500 11.5px/20px var(--ox-mono);color:var(--ox-text-muted);font-variant-numeric:tabular-nums;max-width:18ch;text-align:right}
+.v{font:500 11.5px/20px var(--ox-font);color:var(--ox-text-muted);font-variant-numeric:tabular-nums;max-width:18ch;text-align:right}
 @media (max-width:420px){.v{max-width:10ch;line-height:16px;padding-top:2px}}
 `;
 
@@ -93,7 +95,7 @@ export class OxReceiptRow extends OxEl {
         : st == 'fail'
           ? ICON.alert
           : st == 'yours'
-            ? svg24(QUESTION, 15)
+            ? svg24(PERSON, 18)
             : st == 'unverified'
               ? '<i class="h"></i>'
               : ICON.spin;
