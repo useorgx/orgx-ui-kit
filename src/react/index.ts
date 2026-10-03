@@ -23,8 +23,11 @@ import type {
   ActionState,
   AgentKey,
   AvatarForm,
+  AvatarPreset,
+  AvatarVariant,
   FooterVariant,
   GlyphKind,
+  OxAgentCard as OxAgentCardEl,
   OxAttentionLine as OxAttentionLineEl,
   OxAvatar as OxAvatarEl,
   OxFooter as OxFooterEl,
@@ -251,17 +254,54 @@ export const OxGlyph = wrap<OxGlyphProps, OxGlyphEl>('ox-glyph', 'OxGlyph', {
 
 /* ---------------------------------------------------------------- avatar -- */
 export interface OxAvatarProps extends OxBaseProps {
-  agent: AgentKey | AnyString;
+  /** Agent key, domain or id; "system"/"orgx" (or nothing) shows the OrgX mark. */
+  agent?: AgentKey | AnyString;
   form?: AvatarForm;
-  size?: 48 | 96 | 192 | number;
+  /** inline (28) | row (32) | header (40), or pixels. */
+  size?: AvatarPreset | 48 | 96 | 192 | number;
+  /** photo (default): the original headshots. render: the animated-set renders. */
+  variant?: AvatarVariant;
   baseUrl?: string;
-  /** Display name for agents outside the seven. */
+  /** Display name; a person outside the seven agents gets their initials. */
   name?: string;
   onFallback?: (e: Event) => void;
 }
 export const OxAvatar = wrap<OxAvatarProps, OxAvatarEl>('ox-avatar', 'OxAvatar', {
-  attrs: { agent: 'agent', form: 'form', size: 'size', baseUrl: 'base-url', name: 'name' },
+  attrs: { agent: 'agent', form: 'form', size: 'size', variant: 'variant', baseUrl: 'base-url', name: 'name' },
   events: { onFallback: 'ox-avatar-fallback' },
 });
 
-export type { ActionState, AgentKey, AvatarForm, FooterVariant, GlyphKind, ReceiptStatus };
+export interface OxAgentCardProps extends OxAvatarProps {
+  /** Role or domain; defaults to the agent's domain. */
+  role?: string;
+  /** Current state (any <ox-state-chip> state). */
+  state?: ActionState | AnyString;
+  statusLabel?: string;
+  /** Short text beside the state chip, e.g. "updated 2m ago". */
+  detail?: string;
+  /** Current task. */
+  task?: string;
+  /** "Open in OrgX" link. */
+  href?: string;
+  onToggle?: (e: CustomEvent<{ open: boolean }>) => void;
+  onOpen?: (e: CustomEvent<{ href: string }>) => void;
+}
+export const OxAgentCard = wrap<OxAgentCardProps, OxAgentCardEl>('ox-agent-card', 'OxAgentCard', {
+  attrs: {
+    agent: 'agent',
+    form: 'form',
+    size: 'size',
+    variant: 'variant',
+    baseUrl: 'base-url',
+    name: 'name',
+    role: 'role',
+    state: 'state',
+    statusLabel: 'status-label',
+    detail: 'detail',
+    task: 'task',
+    href: 'href',
+  },
+  events: { onFallback: 'ox-avatar-fallback', onToggle: 'ox-agent-card-toggle', onOpen: 'ox-open' },
+});
+
+export type { ActionState, AgentKey, AvatarForm, AvatarVariant, FooterVariant, GlyphKind, ReceiptStatus };

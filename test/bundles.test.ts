@@ -11,13 +11,13 @@ import { unabbr } from '../src/elements/shared.js';
  */
 const root = resolve(__dirname, '..');
 const dist = (f: string) => readFileSync(resolve(root, 'dist', f), 'utf8');
-const ALL = ['ox-state-chip', 'ox-attention-line', 'ox-receipt-row', 'ox-footer', 'ox-glyph', 'ox-avatar'];
+const ALL = ['ox-state-chip', 'ox-attention-line', 'ox-receipt-row', 'ox-footer', 'ox-glyph', 'ox-avatar', 'ox-agent-card'];
 const CORE = ['ox-state-chip', 'ox-attention-line', 'ox-receipt-row'];
 const SPLIT = ['elements-core.iife.js', 'elements-footer.iife.js', 'elements-glyph.iife.js', 'elements-avatar.iife.js'];
 let src: Record<string, string> = {};
 
 type Win = JSDOM['window'] & {
-  OrgXElements: { ELEMENTS: Record<string, unknown>; avatarConfig: { baseUrl: string }; defineElements(): void };
+  OrgXElements: { ELEMENTS: Record<string, unknown>; avatarConfig: { baseUrl: string; photoBaseUrl: string; variant: string }; defineElements(): void };
 };
 
 function load(...files: string[]): Win {
@@ -57,9 +57,9 @@ describe('split IIFE bundles', () => {
     for (const [file, tag] of [
       ['elements-footer.iife.js', 'ox-footer'],
       ['elements-glyph.iife.js', 'ox-glyph'],
-      ['elements-avatar.iife.js', 'ox-avatar'],
+      ['elements-avatar.iife.js', ['ox-avatar', 'ox-agent-card']],
     ] as const) {
-      expect(defined(load('elements-core.iife.js', file))).toEqual([...CORE, tag]);
+      expect(defined(load('elements-core.iife.js', file))).toEqual([...CORE, ...([] as string[]).concat(tag)]);
     }
     expect(defined(load(...SPLIT))).toEqual(ALL);
   });
@@ -86,8 +86,12 @@ describe('split IIFE bundles', () => {
     w.eval(src['elements-avatar.iife.js']!);
     const el = w.document.createElement('ox-avatar');
     el.setAttribute('agent', 'eli');
+    el.setAttribute('variant', 'render');
     w.document.body.append(el);
     expect(el.shadowRoot!.querySelector('img')!.getAttribute('src')).toBe('https://cdn.test/a/eli-base-48.webp');
+    w.OrgXElements.avatarConfig.photoBaseUrl = 'https://cdn.test/p';
+    el.removeAttribute('variant');
+    expect(el.shadowRoot!.querySelector('img')!.getAttribute('src')).toBe('https://cdn.test/p/eli-48.webp');
   });
 
   it('renders exactly like the full bundle', () => {
@@ -101,6 +105,8 @@ describe('split IIFE bundles', () => {
       ['ox-footer', { variant: 'reads', state: 'loading' }],
       ['ox-glyph', { kind: 'receipt', tone: 'amber', label: 'auto' }],
       ['ox-avatar', { agent: 'dana', form: 'asking', size: '96' }],
+      ['ox-avatar', { name: 'Ada Lovelace' }],
+      ['ox-agent-card', { agent: 'eli', state: 'running', task: 'Ship it', href: 'https://useorgx.com/command/agents/eli' }],
     ];
     for (const [tag, attrs] of cases) {
       const a = render(full, tag, attrs);

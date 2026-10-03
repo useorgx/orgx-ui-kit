@@ -13,8 +13,8 @@
  * Every IIFE registers idempotently (first copy wins), so any combination may
  * be loaded, in any number, as long as core (or the full bundle) comes first.
  *
- * Size budgets (minified bytes): IIFES below. The full IIFE targets 25 KB
- * (warn above it) and fails above 26 KB; every split bundle fails above its
+ * Size budgets (minified bytes): IIFES below. The full IIFE targets 33 KB
+ * (warn above it) and fails above 34 KB; every split bundle fails above its
  * own budget, so a regression cannot slip in unnoticed. Raise a budget only
  * on purpose, in the same change that grows the bundle.
  */
@@ -29,13 +29,15 @@ const entry = resolve(root, 'src/elements/index.ts');
 const KB = 1024;
 /** name -> [entry, budget in bytes (fail above), add-on (reads the core runtime)] */
 const IIFES = {
-  'elements.iife.js': ['iife.ts', 26 * KB, false], // 25.0 KB at 0.2.0-alpha.2
+  // 0.3.0-alpha.0: +7.3 KB for photo avatars (alias resolution, OrgX mark and
+  // initials fallbacks) and the <ox-agent-card> hover card. Was 25.0 KB.
+  'elements.iife.js': ['iife.ts', 34 * KB, false], // 32.3 KB
   'elements-core.iife.js': ['iife-core.ts', 12 * KB, false], // 11.3 KB
   'elements-footer.iife.js': ['iife-footer.ts', 10.5 * KB, true], // 9.8 KB
   'elements-glyph.iife.js': ['iife-glyph.ts', 3 * KB, true], // 2.5 KB
-  'elements-avatar.iife.js': ['iife-avatar.ts', 3 * KB, true], // 2.2 KB
+  'elements-avatar.iife.js': ['iife-avatar.ts', 10 * KB, true], // 9.4 KB: <ox-avatar> 3.6 + <ox-agent-card> 5.7 (was 2.2 KB)
 };
-const TARGET = 25 * KB; // the full IIFE also warns above this
+const TARGET = 33 * KB; // the full IIFE also warns above this
 const banner = `/* @useorgx/orgx-ui-kit elements ${JSON.parse(readFileSync(resolve(root, 'package.json'), 'utf8')).version} */`;
 
 /**

@@ -9,7 +9,7 @@ afterEach(() => {
 
 describe('registration', () => {
   it('defines every element and is idempotent', async () => {
-    for (const tag of ['ox-state-chip', 'ox-attention-line', 'ox-receipt-row', 'ox-footer', 'ox-glyph', 'ox-avatar']) {
+    for (const tag of ['ox-state-chip', 'ox-attention-line', 'ox-receipt-row', 'ox-footer', 'ox-glyph', 'ox-avatar', 'ox-agent-card']) {
       expect(customElements.get(tag), tag).toBeTypeOf('function');
     }
     expect(() => defineElements()).not.toThrow();
@@ -206,26 +206,84 @@ describe('<ox-glyph>', () => {
 });
 
 describe('<ox-avatar>', () => {
-  it('renders ${baseUrl}/${agent}-${form}-${size}.webp with alt text and the agent hue', () => {
-    const el = mount('ox-avatar', { agent: 'eli', form: 'working', size: '48', 'base-url': 'https://cdn.test/avatars/' });
+  it('takes size presets and keeps the ring a hairline below 40 px so the face stays legible', () => {
+    const style = (size: string) => $(mount('ox-avatar', { agent: 'eli', size }), '.a').getAttribute('style')!;
+    expect(style('inline')).toContain('--z:28px;--r:1.5px;--g:1px');
+    expect(style('row')).toContain('--z:32px;--r:1.5px;--g:1px');
+    expect(style('header')).toContain('--z:40px;--r:2px;--g:2px');
+    expect(style('96')).toContain('--z:96px;--r:3px;--g:3px');
+    // 28 px loads the 48 px photo with the 96 px one for 2x screens.
+    const img = $<HTMLImageElement>(mount('ox-avatar', { agent: 'eli', size: 'inline' }), 'img');
+    expect(img.getAttribute('src')).toMatch(/eli-48\.webp$/);
+    expect(img.getAttribute('srcset')).toMatch(/eli-96\.webp 2x$/);
+  });
+
+  it('shows the original headshot by default: ${photoBaseUrl}/${agent}-${size}.webp with the agent hue', () => {
+    const el = mount('ox-avatar', { agent: 'eli', form: 'working', size: '32' });
+    const img = $<HTMLImageElement>(el, 'img');
+    expect(img.getAttribute('src')).toBe('https://mcp.useorgx.com/avatars/agents/photo/eli-48.webp');
+    expect(img.getAttribute('srcset')).toContain('eli-96.webp 2x');
+    // Photos carry no form in the alt; the form is kept for the rendered set.
+    expect(img.alt).toBe('Eli');
+    expect(el.dataset.form).toBe('working');
+    expect(el.dataset.variant).toBe('photo');
+    expect($(el, '.a').getAttribute('style')).toContain('--hue:var(--agent-eli)');
+    expect($(el, '.a').getAttribute('style')).toContain('--z:32px');
+    el.setAttribute('size', '192');
+    expect(img.getAttribute('src')).toMatch(/\/eli-192\.webp$/);
+    expect(img.hasAttribute('srcset')).toBe(false);
+  });
+
+  it('resolves domains, ids and headshot stems to the agent', () => {
+    for (const [agent, key] of [
+      ['Engineering', 'eli'],
+      ['marketing-agent', 'mark'],
+      ['pipeline_intelligence', 'sage'],
+      ['ops', 'orion'],
+    ]) {
+      const el = mount('ox-avatar', { agent, size: '24' });
+      expect(el.dataset.agent, agent).toBe(key);
+      expect($(el, 'img').getAttribute('src')).toMatch(new RegExp(`/${key}-48\\.webp$`));
+    }
+    // A name alone is enough for one of the seven.
+    expect(mount('ox-avatar', { name: 'Dana' }).dataset.agent).toBe('dana');
+    // Whole words only: "Developer" is nobody.
+    expect(mount('ox-avatar', { agent: 'Developer' }).dataset.agent).toBe('');
+  });
+
+  it('renders the animated-set render with variant="render" (or avatarConfig.variant)', () => {
+    const el = mount('ox-avatar', { agent: 'eli', form: 'working', size: '48', variant: 'render', 'base-url': 'https://cdn.test/avatars/' });
     const img = $<HTMLImageElement>(el, 'img');
     expect(img.getAttribute('src')).toBe('https://cdn.test/avatars/eli-working-48.webp');
     expect(img.getAttribute('srcset')).toContain('eli-working-96.webp 2x');
     expect(img.alt).toBe('Eli, working');
-    expect($(el, '.a').getAttribute('style')).toContain('--hue:var(--agent-eli)');
-    el.setAttribute('size', '192');
-    expect(img.getAttribute('src')).toBe('https://cdn.test/avatars/eli-working-192.webp');
-    expect(img.hasAttribute('srcset')).toBe(false);
+    const sage = mount('ox-avatar', { agent: 'sage', size: '96', variant: 'render' });
+    expect($<HTMLImageElement>(sage, 'img').alt).toBe('Sage');
+    expect($<HTMLImageElement>(sage, 'img').getAttribute('src')).toMatch(/\/sage-base-96\.webp$/);
   });
 
-  it('names the base form by the agent alone', () => {
-    const el = mount('ox-avatar', { agent: 'sage', size: '96' });
-    expect($<HTMLImageElement>(el, 'img').alt).toBe('Sage');
-    expect($<HTMLImageElement>(el, 'img').getAttribute('src')).toMatch(/\/sage-base-96\.webp$/);
+  it('shows the OrgX mark for OrgX/system owners and when there is no owner, never an empty circle', () => {
+    for (const attrs of [{ agent: 'system' }, { agent: 'OrgX' }, { name: 'automation' }, {}]) {
+      const el = mount('ox-avatar', { ...attrs, size: '24' });
+      expect($(el, '.a').dataset.kind, JSON.stringify(attrs)).toBe('mark');
+      expect($(el, '.f svg')).toBeTruthy();
+      expect($(el, '.f').getAttribute('aria-label')).toBe(attrs.name ?? 'OrgX');
+      expect($(el, 'img').hasAttribute('src')).toBe(false);
+      expect(el.dataset.agent).toBe('orgx');
+    }
+  });
+
+  it('shows initials for a person who is not an agent, in a neutral ring', () => {
+    const el = mount('ox-avatar', { name: 'Ada Lovelace', size: '32' });
+    expect($(el, '.a').dataset.kind).toBe('initials');
+    expect(text($(el, '.f'))).toBe('AL');
+    expect($(el, '.f').getAttribute('aria-label')).toBe('Ada Lovelace');
+    expect($(el, '.a').getAttribute('style')).toContain('--hue:var(--ox-border-strong)');
+    expect(text($(mount('ox-avatar', { agent: 'hope' }), '.f'))).toBe('H');
   });
 
   it('falls back to the initial in the same footprint when the image fails', () => {
-    const el = mount('ox-avatar', { agent: 'dana', form: 'asking', size: '48' });
+    const el = mount('ox-avatar', { agent: 'dana', form: 'asking', size: '48', variant: 'render' });
     const onFallback = vi.fn();
     el.addEventListener('ox-avatar-fallback', onFallback);
     $(el, 'img').dispatchEvent(new Event('error'));
@@ -236,6 +294,115 @@ describe('<ox-avatar>', () => {
     expect(fb.getAttribute('aria-label')).toBe('Dana, asking');
     expect(onFallback).toHaveBeenCalledOnce();
     expect($(el, '.a').getAttribute('style')).toContain('--z:48px');
+  });
+});
+
+describe('<ox-agent-card>', () => {
+  const card = (attrs: Record<string, string> = {}, label = '') =>
+    mount(
+      'ox-agent-card',
+      { agent: 'eli', name: 'Eli', state: 'running', task: 'Run the conformance checks', href: 'https://useorgx.com/command/agents/eli', ...attrs },
+      label,
+    );
+  const panel = (el: Element) => $(el, '.p');
+  const trigger = (el: Element) => $<HTMLButtonElement>(el, 'button');
+
+  it('is a button around the avatar with aria-expanded and a generated name', () => {
+    const el = card({ size: '28' }, '<b>Eli</b>');
+    const b = trigger(el);
+    expect(b.getAttribute('type')).toBe('button');
+    expect(b.getAttribute('aria-expanded')).toBe('false');
+    expect(b.getAttribute('aria-haspopup')).toBe('dialog');
+    expect(b.getAttribute('aria-label')).toBe('Eli: show details');
+    const av = $(el, 'button ox-avatar');
+    expect(av.getAttribute('agent')).toBe('eli');
+    expect(av.getAttribute('size')).toBe('28');
+    expect(panel(el).hidden).toBe(true);
+    expect(el.querySelector('b')!.textContent).toBe('Eli');
+  });
+
+  it('opens on click with name, domain, state chip, task and the OrgX link; Esc closes and returns focus', () => {
+    const el = card();
+    trigger(el).click();
+    const p = panel(el);
+    expect(p.hidden).toBe(false);
+    expect(trigger(el).getAttribute('aria-expanded')).toBe('true');
+    expect(p.getAttribute('role')).toBe('dialog');
+    expect(text(p.querySelector('.n'))).toBe('Eli');
+    expect(text(p.querySelector('.r'))).toBe('Engineering');
+    expect(p.querySelector('ox-state-chip')!.getAttribute('state')).toBe('running');
+    expect(text(p.querySelector('.v'))).toBe('Run the conformance checks');
+    const a = p.querySelector('a')!;
+    expect(a.getAttribute('href')).toBe('https://useorgx.com/command/agents/eli');
+    expect(text(a)).toBe('Open in OrgX');
+    key(document.body, 'keydown', 'Escape');
+    expect(p.hidden).toBe(true);
+    expect(trigger(el).getAttribute('aria-expanded')).toBe('false');
+    expect(el.shadowRoot!.activeElement).toBe(trigger(el));
+  });
+
+  it('toggles on a second click (tap) and closes on a click outside', () => {
+    const el = card();
+    trigger(el).click();
+    trigger(el).click();
+    expect(panel(el).hidden).toBe(true);
+    trigger(el).click();
+    pointer(document.body, 'pointerdown');
+    expect(panel(el).hidden).toBe(true);
+    // A press inside the card keeps it open.
+    trigger(el).click();
+    pointer(panel(el), 'pointerdown');
+    expect(panel(el).hidden).toBe(false);
+  });
+
+  it('opens on keyboard focus', () => {
+    const el = card();
+    trigger(el).focus();
+    expect(panel(el).hidden).toBe(false);
+  });
+
+  it('routes the link through a cancelable ox-open event', () => {
+    const el = card();
+    const onOpen = vi.fn((e: Event) => e.preventDefault());
+    el.addEventListener('ox-open', onOpen);
+    trigger(el).click();
+    const a = panel(el).querySelector('a')!;
+    const click = new MouseEvent('click', { bubbles: true, composed: true, cancelable: true });
+    a.dispatchEvent(click);
+    expect(onOpen).toHaveBeenCalledOnce();
+    expect((onOpen.mock.calls[0]![0] as CustomEvent).detail).toEqual({ href: 'https://useorgx.com/command/agents/eli' });
+    expect(click.defaultPrevented).toBe(true);
+  });
+
+  it('omits what it does not know, and never links an unsafe href', () => {
+    const el = mount('ox-agent-card', { agent: 'system', href: 'javascript:alert(1)' });
+    trigger(el).click();
+    const p = panel(el);
+    expect(text(p.querySelector('.n'))).toBe('OrgX');
+    expect(p.querySelector('.r')).toBeNull();
+    expect(p.querySelector('ox-state-chip')).toBeNull();
+    expect(p.querySelector('.k')).toBeNull();
+    expect(p.querySelector('a')).toBeNull();
+  });
+
+  it('flips above the trigger near the bottom edge and shifts left near the right edge', () => {
+    const el = card();
+    const b = trigger(el);
+    const p = panel(el);
+    const rect = (r: Partial<DOMRect>) => () => ({ x: 0, y: 0, width: 0, height: 0, top: 0, left: 0, right: 0, bottom: 0, toJSON() {}, ...r }) as DOMRect;
+    b.getBoundingClientRect = rect({ left: 1000, right: 1024, top: 740, bottom: 764, width: 24, height: 24 });
+    Object.defineProperty(p, 'offsetWidth', { configurable: true, get: () => 288 });
+    Object.defineProperty(p, 'offsetHeight', { configurable: true, get: () => 180 });
+    b.click();
+    expect(p.dataset.side).toBe('top');
+    expect(parseInt(p.style.left, 10) + 288).toBeLessThanOrEqual(1024 - 8);
+    expect(parseInt(p.style.top, 10)).toBe(740 - 8 - 180);
+    key(document.body, 'keydown', 'Escape');
+    b.getBoundingClientRect = rect({ left: 4, right: 28, top: 10, bottom: 34, width: 24, height: 24 });
+    b.click();
+    expect(p.dataset.side).toBe('bottom');
+    expect(p.style.left).toBe('8px');
+    expect(p.style.top).toBe('42px');
   });
 });
 

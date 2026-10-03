@@ -98,7 +98,18 @@ export function define(name: string, ctor: CustomElementConstructor): void {
  * exposes OrgXElements.avatarConfig even when the avatar add-on is not loaded,
  * and the add-on shares the same object.
  */
-export const avatarConfig = { baseUrl: 'https://mcp.useorgx.com/widgets/shared/avatars' };
+export const avatarConfig: {
+  /** The animated-set renders, `<agent>-<form>-<size>.webp` (variant="render"). */
+  baseUrl: string;
+  /** The original headshots, `<agent>-<size>.webp` (variant="photo"). */
+  photoBaseUrl: string;
+  /** Which set every <ox-avatar> without a variant attribute shows. */
+  variant: 'photo' | 'render';
+} = {
+  baseUrl: 'https://mcp.useorgx.com/widgets/shared/avatars',
+  photoBaseUrl: 'https://mcp.useorgx.com/avatars/agents/photo',
+  variant: 'photo',
+};
 
 /** The global the IIFE bundles share: window.OrgXElements. */
 export interface OrgXElementsGlobal {
