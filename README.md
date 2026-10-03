@@ -59,9 +59,9 @@ Inline both files into the widget HTML so it renders with no network round-trip:
 
 | bundle | elements | min | gzip | budget (build fails above) |
 | --- | --- | --- | --- | --- |
-| `elements.iife.js` | all seven | 32.7 KB | 13.1 KB | 34 KB (warns above 33 KB) |
+| `elements.iife.js` | all seven | 33.0 KB | 13.2 KB | 34 KB (warns above 33 KB) |
 | `elements-core.iife.js` | runtime, `ox-state-chip`, `ox-attention-line`, `ox-receipt-row` | 11.6 KB | 5.4 KB | 12 KB |
-| `elements-footer.iife.js` | `ox-footer` | 10.0 KB | 4.6 KB | 10.5 KB |
+| `elements-footer.iife.js` | `ox-footer` | 10.3 KB | 4.7 KB | 10.5 KB |
 | `elements-glyph.iife.js` | `ox-glyph` | 2.5 KB | 1.2 KB | 3 KB |
 | `elements-avatar.iife.js` | `ox-avatar`, `ox-agent-card` | 9.6 KB | 4.5 KB | 10 KB |
 
@@ -151,7 +151,7 @@ One line of proof. `status`: `met` (teal check), `fail` (red alert), `yours` (am
 
 ### `<ox-footer variant state>`
 
-The four footers from SM3. One 64 px row in every state: status icon, two lines of text, at most one text action and one primary. The action area reserves the width of every label it will show, so the row never reflows. Heading and detail wrap to two lines; when text and actions don't fit side by side (phones) the actions move below the text, right-aligned, and wrap again if needed, so nothing is clipped.
+The four footers from SM3. One 64 px row in every state: status icon, two lines of text, at most one text action and one primary. The action area reserves the width of every label it will show, so the row never reflows. Heading and detail get two lines beside the actions; when either needs more (phones), the text takes the row and the actions move below it, right-aligned, wrapping again if needed, so nothing is clipped.
 
 | variant | states |
 | --- | --- |
