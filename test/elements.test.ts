@@ -471,8 +471,12 @@ describe('<ox-footer>', () => {
   });
 
   it('wraps instead of clipping at phone widths: two-line text, actions move below and wrap', () => {
+    // jsdom has no layout: nothing overflows, so the footer stays side by side.
+    expect($(mount('ox-footer', { variant: 'reads', state: 'fresh' }), '.f').classList.contains('s')).toBe(false);
     const css = cssOf(mount('ox-footer', { variant: 'queues-work', state: 'needs-you' }));
     expect(css).toMatch(/\.f\s*\{[^}]*flex-wrap:\s*wrap/);
+    // Stacked ("s"): the text takes the row and the actions move below it.
+    expect(css).toMatch(/\.s \.t\s*\{[^}]*flex-basis:\s*100%/);
     // Heading and detail get two lines, never a one-line ellipsis.
     expect(css).toMatch(/\.h,\s*\.d\s*\{[^}]*-webkit-line-clamp:\s*2/);
     expect(css).not.toMatch(/\.h,\s*\.d\s*\{[^}]*text-overflow:\s*ellipsis/);
