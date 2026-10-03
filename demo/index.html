@@ -229,7 +229,7 @@
   holdBtn.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, button: 0, pointerId: 1 }));
 
   // Glyphs
-  ['goal','initiative','workstream','milestone','task','run','decision','question','artifact','receipt'].forEach(function (k) {
+  ['goal','initiative','workstream','milestone','task','run','decision','person','question','artifact','receipt'].forEach(function (k) {
     document.getElementById('glyphs').append(h('<div class="card glyph"><div class="ramp"><ox-glyph kind="' + k + '" size="32" tone="text" label="auto"></ox-glyph><ox-glyph kind="' + k + '" size="14"></ox-glyph><ox-glyph kind="' + k + '" size="18"></ox-glyph><ox-glyph kind="' + k + '" size="24" tone="amber"></ox-glyph><ox-glyph kind="' + k + '" size="24" tone="teal"></ox-glyph></div><span class="gname">' + k[0].toUpperCase() + k.slice(1) + '</span></div>'));
   });
 

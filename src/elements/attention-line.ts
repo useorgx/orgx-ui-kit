@@ -7,7 +7,7 @@ const CSS = `
 .t{font-size:13.5px;line-height:1.3;font-weight:650;color:var(--tone);min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:color .6s}
 [data-tone=teal] .t{color:var(--ox-text-2);font-weight:500}
 .s{flex:1}
-::slotted([slot=meta]){font:500 11.5px/1.3 var(--ox-mono);color:var(--ox-text-muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+::slotted([slot=meta]){font:500 11.5px/1.3 var(--ox-font);color:var(--ox-text-muted);white-space:nowrap;font-variant-numeric:tabular-nums}
 @media (max-width:420px){::slotted([slot=meta]){display:none}.t{white-space:normal}}
 `;
 

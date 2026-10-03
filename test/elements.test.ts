@@ -2,6 +2,15 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ACTION_STATES, FOOTER_FRAMES, GLYPH_KINDS, defineElements } from '../src/elements/index.js';
 import { $, key, mount, pointer, shadow, text } from './helpers.js';
 
+/** Every rule the element's shadow root adopted, as text. */
+const cssOf = (el: Element) => {
+  const root = shadow(el);
+  return [
+    ...(root.adoptedStyleSheets ?? []).flatMap((s) => Array.from(s.cssRules, (r) => r.cssText)),
+    root.querySelector('style')?.textContent ?? '',
+  ].join('\n');
+};
+
 afterEach(() => {
   document.body.innerHTML = '';
   vi.useRealTimers();
@@ -78,6 +87,13 @@ describe('<ox-state-chip>', () => {
     const all = mount('ox-state-chip', { state: 'queued', reserve: 'all' });
     expect(shadow(all).querySelectorAll('.g').length).toBe(Object.keys(ACTION_STATES).length - 1);
   });
+
+  it('speaks in the sans meta voice and drops the reserved width at phone widths', () => {
+    const css = cssOf(mount('ox-state-chip', { state: 'running', reserve: 'all' }));
+    expect(css).not.toContain('--ox-mono');
+    expect(css).toMatch(/\.c\s*\{[^}]*font:[^;}]*var\(--ox-font\)/);
+    expect(css).toMatch(/@media \(max-width: ?480px\)\s*\{\s*\.g\s*\{\s*display:\s*none/);
+  });
 });
 
 describe('<ox-attention-line>', () => {
@@ -138,6 +154,16 @@ describe('<ox-receipt-row>', () => {
     expect(mount('ox-receipt-row', { status: 'passed', label: 'x' }).dataset.status).toBe('met');
   });
 
+  it('marks "your call" with the person glyph, not a tiny question mark, and keeps values sans', () => {
+    const el = mount('ox-receipt-row', { status: 'yours', label: 'Ship annual pricing', value: '2d' });
+    const svg = $(el, '.i.yours svg');
+    expect(svg.getAttribute('width')).toBe('18');
+    expect(svg.innerHTML).toContain('cy="7.6"');
+    expect(svg.innerHTML).not.toContain('M9.6 8.2');
+    expect(text($(el, '.sr'))).toBe('Your call:');
+    expect(cssOf(el)).not.toContain('--ox-mono');
+  });
+
   it('becomes a link with href and lets the host route it through ox-open', () => {
     const el = mount('ox-receipt-row', { status: 'met', label: 'CI run 1182 · passed', value: '2d ago', href: 'https://useorgx.com/r/1' });
     const a = $<HTMLAnchorElement>(el, 'a');
@@ -181,6 +207,7 @@ describe('<ox-glyph>', () => {
       'task',
       'run',
       'decision',
+      'person',
       'question',
       'artifact',
       'receipt',
@@ -193,6 +220,15 @@ describe('<ox-glyph>', () => {
       expect(el.getAttribute('aria-hidden')).toBe('true');
       expect(el.dataset.kind).toBe(kind);
     }
+  });
+
+  it('draws the decision as an outlined diamond, matching the widgets\' OrgXIcons', () => {
+    const svg = $(mount('ox-glyph', { kind: 'decision' }), 'svg');
+    const diamond = svg.querySelector('path')!;
+    expect(diamond.getAttribute('d')).toBe('M12 2.8 21.2 12 12 21.2 2.8 12z');
+    // The outline is stroked (not a field-only shape), so it reads as a diamond, not a "Y".
+    expect(diamond.getAttribute('stroke')).not.toBe('none');
+    expect(svg.querySelectorAll('circle').length).toBe(0);
   });
 
   it('becomes a named image with a label and resizes', () => {
@@ -432,6 +468,21 @@ describe('<ox-footer>', () => {
       }
       expect($(el, '.g').getAttribute('aria-hidden')).toBe('true');
     }
+  });
+
+  it('wraps instead of clipping at phone widths: two-line text, actions move below and wrap', () => {
+    const css = cssOf(mount('ox-footer', { variant: 'queues-work', state: 'needs-you' }));
+    expect(css).toMatch(/\.f\s*\{[^}]*flex-wrap:\s*wrap/);
+    // Heading and detail get two lines, never a one-line ellipsis.
+    expect(css).toMatch(/\.h,\s*\.d\s*\{[^}]*-webkit-line-clamp:\s*2/);
+    expect(css).not.toMatch(/\.h,\s*\.d\s*\{[^}]*text-overflow:\s*ellipsis/);
+    // The action area is never capped below the card width, and its buttons wrap.
+    expect(css).not.toMatch(/\.a\s*\{[^}]*max-width:\s*62%/);
+    expect(css).toMatch(/\.a\s*\{[^}]*max-width:\s*100%/);
+    expect(css).toMatch(/\.v\s*\{[^}]*flex-wrap:\s*wrap/);
+    // 44 px targets: 36 px buttons with a 4 px hit extension above and below.
+    expect(css).toMatch(/\.b\s*\{[^}]*min-height:\s*36px/);
+    expect(css).toMatch(/\.b::after\s*\{[^}]*inset:\s*-4px -2px/);
   });
 
   it('marks links to OrgX and busy primaries', () => {
