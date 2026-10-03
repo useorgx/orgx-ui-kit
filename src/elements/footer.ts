@@ -147,15 +147,12 @@ export class OxFooter extends OxEl {
 
   /** Side by side while heading and detail fit in two lines each; else stack (class "s"). */
   #fit() {
-    const f = this._q('.f');
-    const over = (s: string) => {
-      const e = this._q(s);
-      return e.scrollHeight > e.clientHeight + 1;
-    };
-    f.classList.remove('s');
+    const c = this._q('.f').classList;
+    const over = (e: Element) => e.scrollHeight > e.clientHeight + 1;
+    c.remove('s');
     const w = this._q('.t').clientWidth;
     // w is 0 before layout (hidden, or no layout engine): decide on the next resize.
-    if (w && (w < 64 || over('.h') || over('.d'))) f.classList.add('s');
+    if (w && (w < 64 || over(this._q('.h')) || over(this._q('.d')))) c.add('s');
   }
 
   disconnectedCallback() {
