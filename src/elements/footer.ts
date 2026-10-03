@@ -20,7 +20,7 @@ const CSS = `
 .arc{animation:ox-drain var(--u) linear var(--ud) forwards}
 @keyframes ox-drain{to{stroke-dashoffset:53.4}}
 .t{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1 1 0;font-size:13.5px;line-height:1.25}
-.s .t{flex-basis:100%}
+.s .t{flex-basis:calc(100% - 32px)}
 .n{animation:ox-fade .12s}
 .h{font-weight:600}
 [data-tone=red] .h{color:var(--ox-danger)}
