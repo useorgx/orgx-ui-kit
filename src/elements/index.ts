@@ -27,16 +27,18 @@ export {
   AGENTS,
   AGENT_KEYS,
   AVATAR_FORMS,
+  AVATAR_PRESETS,
   AVATAR_SIZES,
   AVATAR_VARIANTS,
   ORGX_MARK,
   avatarConfig,
+  avatarSize,
   avatarUrl,
   initials,
   photoUrl,
   resolveAgent,
 } from './avatar.js';
-export type { AgentKey, AvatarForm, AvatarVariant } from './avatar.js';
+export type { AgentKey, AvatarForm, AvatarPreset, AvatarVariant } from './avatar.js';
 
 export { ELEMENTS, defineElements };
 

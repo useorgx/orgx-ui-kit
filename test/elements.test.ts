@@ -206,6 +206,18 @@ describe('<ox-glyph>', () => {
 });
 
 describe('<ox-avatar>', () => {
+  it('takes size presets and keeps the ring a hairline below 40 px so the face stays legible', () => {
+    const style = (size: string) => $(mount('ox-avatar', { agent: 'eli', size }), '.a').getAttribute('style')!;
+    expect(style('inline')).toContain('--z:28px;--r:1.5px;--g:1px');
+    expect(style('row')).toContain('--z:32px;--r:1.5px;--g:1px');
+    expect(style('header')).toContain('--z:40px;--r:2px;--g:2px');
+    expect(style('96')).toContain('--z:96px;--r:3px;--g:3px');
+    // 28 px loads the 48 px photo with the 96 px one for 2x screens.
+    const img = $<HTMLImageElement>(mount('ox-avatar', { agent: 'eli', size: 'inline' }), 'img');
+    expect(img.getAttribute('src')).toMatch(/eli-48\.webp$/);
+    expect(img.getAttribute('srcset')).toMatch(/eli-96\.webp 2x$/);
+  });
+
   it('shows the original headshot by default: ${photoBaseUrl}/${agent}-${size}.webp with the agent hue', () => {
     const el = mount('ox-avatar', { agent: 'eli', form: 'working', size: '32' });
     const img = $<HTMLImageElement>(el, 'img');

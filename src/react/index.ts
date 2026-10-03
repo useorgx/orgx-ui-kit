@@ -23,6 +23,7 @@ import type {
   ActionState,
   AgentKey,
   AvatarForm,
+  AvatarPreset,
   AvatarVariant,
   FooterVariant,
   GlyphKind,
@@ -256,7 +257,8 @@ export interface OxAvatarProps extends OxBaseProps {
   /** Agent key, domain or id; "system"/"orgx" (or nothing) shows the OrgX mark. */
   agent?: AgentKey | AnyString;
   form?: AvatarForm;
-  size?: 48 | 96 | 192 | number;
+  /** inline (28) | row (32) | header (40), or pixels. */
+  size?: AvatarPreset | 48 | 96 | 192 | number;
   /** photo (default): the original headshots. render: the animated-set renders. */
   variant?: AvatarVariant;
   baseUrl?: string;

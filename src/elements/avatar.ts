@@ -36,6 +36,16 @@ const SYSTEM = new Set(['orgx', 'system', 'orgx_system', 'automation', 'auto', '
 export const AVATAR_FORMS = ['base', 'strategic', 'proactive', 'working', 'asking', 'verifying'] as const;
 export type AvatarForm = (typeof AVATAR_FORMS)[number];
 export const AVATAR_SIZES = [48, 96, 192] as const;
+/**
+ * Named display sizes, so a headshot is always legible: `inline` beside text
+ * (28), `row` in list rows (32), `header` in card headers (40). `size` takes a
+ * preset name or a pixel number (minimum 16).
+ */
+export const AVATAR_PRESETS = { inline: 28, row: 32, header: 40 } as const;
+export type AvatarPreset = keyof typeof AVATAR_PRESETS;
+/** Preset name or pixels -> pixels (default 48). */
+export const avatarSize = (v: string | number | null | undefined): number =>
+  Math.max(16, Math.round(AVATAR_PRESETS[v as AvatarPreset] ?? (+v! || 48)));
 /** photo: the original headshots (default). render: the animated-set renders, one per form. */
 export const AVATAR_VARIANTS = ['photo', 'render'] as const;
 export type AvatarVariant = (typeof AVATAR_VARIANTS)[number];
@@ -77,7 +87,7 @@ img{object-fit:cover}
 `;
 
 /**
- * <ox-avatar agent="eli" size="32">                 the original headshot (photo, the default)
+ * <ox-avatar agent="eli" size="row">                the original headshot (photo, the default); size: inline|row|header or px
  * <ox-avatar agent="eli" form="working" variant="render">  the animated-set render for a form
  * <ox-avatar agent="system">                        the OrgX mark (also: orgx, automation, or no owner)
  * <ox-avatar name="Ada Lovelace">                   initials for a person who is not an agent
@@ -132,15 +142,18 @@ export class OxAvatar extends OxEl {
     const f = slug(this._a('form'));
     const form = (AVATAR_FORMS as readonly string[]).includes(f) ? f : 'base';
     const variant: AvatarVariant = (this._a('variant') ?? avatarConfig.variant) == 'render' ? 'render' : 'photo';
-    const size = Math.max(16, Math.round(+this._a('size')! || 48));
-    const ring = size < 80 ? 2 : size < 160 ? 3 : 4;
+    const size = avatarSize(this._a('size'));
+    // Below 40 px the ring is a 1.5 px hairline with a 1 px gap, so the face
+    // keeps most of the circle (28 px -> a 23 px photo); larger sizes step up.
+    const ring = size < 40 ? 1.5 : size < 80 ? 2 : size < 160 ? 3 : 4;
+    const gap = size < 40 ? 1 : ring < 3 ? 2 : 3;
     const hue = key ? `--agent-${key}` : '--ox-mute';
     const kind = key ? 'agent' : isMark ? 'mark' : 'initials';
     const letters = key ? key[0]!.toUpperCase() : initials(name) || '?';
     // The wrapper reserves the full footprint before the image arrives.
     this.#a.setAttribute(
       'style',
-      `--z:${size}px;--r:${ring}px;--g:${ring < 3 ? 2 : 3}px;--hue:var(${key ? hue : '--ox-border-strong'});--hue-rgb:var(${hue}-rgb);--fs:${letters.length > 1 ? 0.32 : 0.38}`,
+      `--z:${size}px;--r:${ring}px;--g:${gap}px;--hue:var(${key ? hue : '--ox-border-strong'});--hue-rgb:var(${hue}-rgb);--fs:${letters.length > 1 ? 0.32 : 0.38}`,
     );
     this.#a.dataset.kind = kind;
     this.dataset.agent = key ?? (isMark ? 'orgx' : '');

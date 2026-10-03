@@ -207,7 +207,7 @@ export class OxAgentCard extends OxEl {
     const safe = /^(https?:|[/?#])/i.test(href);
     const label = a('status-label');
     this.#p.innerHTML =
-      `<div class="h"><ox-avatar agent="${esc(a('agent'))}" name="${esc(name)}" size="40"${a('variant') ? ` variant="${esc(a('variant'))}"` : ''}${a('base-url') ? ` base-url="${esc(a('base-url'))}"` : ''}></ox-avatar>` +
+      `<div class="h"><ox-avatar agent="${esc(a('agent'))}" name="${esc(name)}" size="header"${a('variant') ? ` variant="${esc(a('variant'))}"` : ''}${a('base-url') ? ` base-url="${esc(a('base-url'))}"` : ''}></ox-avatar>` +
       `<div class="id"><span class="n" id="n">${esc(name)}</span>${role ? `<span class="r">${esc(role)}</span>` : ''}</div></div>` +
       (state || detail
         ? `<div class="s">${state ? `<ox-state-chip state="${esc(state)}"${label ? ` label="${esc(label)}"` : ''}></ox-state-chip>` : ''}${detail ? `<span>${esc(detail)}</span>` : ''}</div>`
@@ -223,7 +223,8 @@ export class OxAgentCard extends OxEl {
       if (v == null) av.removeAttribute(n);
       else if (av.getAttribute(n) != v) av.setAttribute(n, v);
     }
-    if (!this._a('size')) av.setAttribute('size', '24');
+    // Default: legible beside text (the inline preset, 28 px).
+    if (!this._a('size')) av.setAttribute('size', 'inline');
     const name = (this._a('name') ?? '').trim() || (resolveAgent(this._a('agent')) ?? '');
     const who = name ? name[0]!.toUpperCase() + name.slice(1) : 'OrgX';
     this.#b.setAttribute('aria-label', `${who}: show details`);

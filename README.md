@@ -59,7 +59,7 @@ Inline both files into the widget HTML so it renders with no network round-trip:
 
 | bundle | elements | min | gzip | budget (build fails above) |
 | --- | --- | --- | --- | --- |
-| `elements.iife.js` | all seven | 32.3 KB | 12.9 KB | 34 KB (warns above 33 KB) |
+| `elements.iife.js` | all seven | 32.4 KB | 13.0 KB | 34 KB (warns above 33 KB) |
 | `elements-core.iife.js` | runtime, `ox-state-chip`, `ox-attention-line`, `ox-receipt-row` | 11.3 KB | 5.3 KB | 12 KB |
 | `elements-footer.iife.js` | `ox-footer` | 9.8 KB | 4.5 KB | 10.5 KB |
 | `elements-glyph.iife.js` | `ox-glyph` | 2.5 KB | 1.2 KB | 3 KB |
@@ -171,6 +171,8 @@ The four footers from SM3. One 64 px row in every state: status icon, two lines 
 The G1 set: `goal`, `initiative`, `workstream`, `milestone`, `task`, `run`, `decision`, `question`, `artifact`, `receipt`. 24-unit grid, 1.8 stroke. `tone`: muted (default), `amber`, `teal`, `red`, `text`, `current`. Decorative unless `label` is set (`label="auto"` reads the kind). `--ox-glyph-size` sizes every glyph in a container.
 
 ### `<ox-avatar agent name size variant form base-url>`
+
+`size` is a preset or pixels: `inline` (28, beside text), `row` (32, list rows), `header` (40, card headers). Below 40 px the hue ring is a 1.5 px hairline with a 1 px gap, so a 28 px avatar shows a 23 px face; 40-79 px use 2 px, larger 3-4 px. Use at least `inline` for headshots; smaller sizes reduce the face to a smudge.
 
 Photo mode is the default: the agent's original headshot, `${photoBaseUrl}/${agent}-${size}.webp`, in a circle with the agent's hue ring, plus a 2x `srcset` when a larger image exists. `agent` takes a key (`eli`), a domain (`engineering`), an id (`engineering-agent`) or a headshot stem (`engineering_autopilot`); `resolveAgent()` exposes the same matching. Fallbacks never leave an empty circle: `agent="system"` / `orgx` / `automation`, or no agent and no name, shows the OrgX mark; a `name` that is not an agent shows its initials on a neutral ring. If an image fails, the agent's initial takes its place in the same footprint and `ox-avatar-fallback` fires.
 
