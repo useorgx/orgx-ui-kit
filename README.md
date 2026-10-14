@@ -78,6 +78,8 @@ The OrgX design core is quiet when fine and draws attention when needed: amber m
 
 ## Widgets (MCP HTML)
 
+The `callTool` and `openWidgetLink` names in the example below are integration hooks supplied by the consuming application, not kit exports or declarations of hosted OrgX MCP operations. Replace them with that host's supported, authenticated bridge.
+
 Inline both files into the widget HTML so it renders with no network round-trip:
 
 ```html
