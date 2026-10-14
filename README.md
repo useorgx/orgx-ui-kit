@@ -1,6 +1,69 @@
 # @useorgx/orgx-ui-kit
 
-The OrgX design core: one token source, framework-free custom elements for MCP widgets, and React for the app. Quiet when fine, loud only when it needs you: amber means it needs you, teal means accepted or moving, red means it failed and can be retried. The one primary action is the homepage lime (`--ox-action`) with dark text, in every widget and both themes.
+For developers building OrgX frontends and MCP widgets, this kit provides one token source, framework-free custom elements, and typed React wrappers. State chips, proof rows, attention lines, and action footers use the same wording and visual semantics across surfaces.
+
+## UI preview
+
+![OrgX element gallery in dark theme showing attention lines and lifecycle state chips rendered from the current kit build](docs/images/elements-demo.png)
+
+Captured from the shipped `demo/index.html` with example states and external requests blocked ([capture details](docs/images/preview-provenance.md)). [Open the live local element gallery](http://127.0.0.1:8020/demo/index.html?theme=dark) after the quickstart. The [hosted MCP widget gallery](https://mcp.useorgx.com/widgets/index.html) shows a separate consumer of the kit. GitHub embeds the screenshot, not a live app.
+
+## Quickstart
+
+Use Node.js 22 and Python 3 for this local development path:
+
+```bash
+git clone https://github.com/useorgx/orgx-ui-kit.git
+cd orgx-ui-kit
+npm ci --ignore-scripts
+npm run build
+python3 -m http.server 8020 --bind 127.0.0.1
+```
+
+Open `http://127.0.0.1:8020/demo/index.html?theme=dark`. The build creates tokens, ESM/types, and IIFE bundles. The demo works without an OrgX account or model key. Avatar URLs may request hosted images; missing images have a built-in fallback.
+
+## Example: render and update a state chip
+
+In a local HTML page under `demo/`, load the built files and add a chip:
+
+```html
+<link rel="stylesheet" href="../dist/tokens.css">
+<script src="../dist/elements.iife.js"></script>
+<ox-state-chip id="run-state" state="running" detail="step 1 of 2"></ox-state-chip>
+<script>
+  const chip = document.getElementById('run-state');
+  chip.setAttribute('state', 'succeeded');
+  chip.removeAttribute('detail');
+</script>
+```
+
+Serve the page from the repo root using the quickstart server. **Success:** the chip displays **Done**, keeps its status semantics, and reads the kit's theme tokens. Use **Switch theme** in the built-in gallery to compare the same states in light and dark. Changing an element's visual state does not complete real work; the consuming application owns that operation and its evidence.
+
+## Docs and troubleshooting
+
+- [Entry points](#technical-reference), [elements and events](#elements), [React/Tailwind integration](#the-app-react--tailwind), and [tokens](#tokens) are documented below.
+- Blank or undefined element: run `npm run build` first, verify both file paths, and load tokens plus the full elements bundle, or core before split add-ons from the same build.
+- Unstyled React surface: import `tokens.css` and configure the Tailwind preset/content paths for the consumer. React 18/19 is a peer dependency for wrappers; custom elements do not require React.
+- Source checks: `npm run type-check`, `npm run build`, and `npm test`. The build prints bundle budgets; do not edit generated `dist/tokens.*` to fix a token.
+- Avatar fallback is expected when the configured asset host is unavailable. Configure the documented base URL for a controlled asset source.
+
+## For agents
+
+This project is a UI library, with no MCP server, agent credential store, or purchasing API. Discover supported exports in [package.json](package.json), element attributes/events in [Elements](#elements), and React prop types in [src/react/index.ts](src/react/index.ts). Use the actual exports and generated type declarations; do not invent a tool endpoint or pass secrets to an element.
+
+In a bundler-based React consumer, import `@useorgx/orgx-ui-kit/tokens.css` once and use wrappers from `@useorgx/orgx-ui-kit/react`, such as `<OxStateChip state="running" />`. Configure the Tailwind preset for the older surface components. In self-contained MCP HTML, inline the required built CSS/JS and route actions/links through the host's supported bridge, as shown below.
+
+Edit `tokens/tokens.json` for token changes and the source element/wrapper for behavior. Preserve event names and accessible states. The consuming app supplies authentication, authorization, backend operations and verification; an enabled button or a "Done" chip grants none of those rights.
+
+Verify a change by building and running tests, then inspect the built-in gallery at desktop and 375-pixel width and the affected consuming surface. A useful invocation is: "Use the current receipt-row and footer exports, preserve their events, and show the loading, success, error and keyboard-focus states with synthetic data." Report observed states separately from backend outcomes.
+
+## Costs and license status
+
+The public package is marked **UNLICENSED**; visibility is not a permission or open-source license grant. The local gallery has no checkout, hosted-plan requirement, or model integration. Hosting, a consuming application's OrgX plan, and any third-party model calls are separate costs; see [OrgX pricing](https://useorgx.com/pricing) when integrating the hosted service. The kit has no payment or agent purchasing capability.
+
+## Technical reference
+
+The OrgX design core is quiet when fine and draws attention when needed: amber means it needs you, teal means accepted or moving, red means it failed and can be retried. Primary actions use the token-defined lime with dark text.
 
 | Entry point | What it is | Use it in |
 | --- | --- | --- |
@@ -69,7 +132,7 @@ The budgets live in `scripts/build-bundles.mjs`; `npm run build` prints every si
 
 Theme: the widget SDK sets `data-theme` on `<html>` from `?theme=`; without it the OS preference applies. The elements read nothing but `--ox-*` and `--agent-*` variables, so there is nothing else to configure.
 
-Size: `elements.iife.js` is 24.9 KB minified, 10.4 KB gzip (`npm run build` prints it; the target is 25 KB and the build fails above 26 KB). See the split bundles above for widgets that use only some elements.
+Size: the current `elements.iife.js` build is 33.0 KB minified and 13.2 KB gzip; the build fails above its 34 KB budget. `npm run build` prints current sizes and thresholds. See the split bundles above for widgets that use only some elements.
 
 ## The app (React + Tailwind)
 
@@ -160,7 +223,7 @@ The four footers from SM3. One 64 px row in every state: status icon, two lines 
 | `queues-work` | `needs-you` · `held` · `queued` · `running` · `partial` · `done` |
 | `reads` | `loading` · `fresh` · `stale` · `refreshing` · `failed` · `caught-up` |
 
-- Copy: `heading`, `detail`, `primary-label`, `action-label` describe the current state (set them with the state); a trailing ` ↗` or a frame that opens OrgX adds the external arrow and ", opens OrgX" to the name. Defaults are the SM3 wording.
+- Copy: `heading`, `detail`, `primary-label`, `action-label` describe the current state (set them with the state); a trailing `↗` or a frame that opens OrgX adds the external arrow and ", opens OrgX" to the name. Defaults are the SM3 wording.
 - Undo window (`held`): `undo-seconds` (default 10) or `undo-deadline` (epoch ms, so a reload shows the true time left). The ring drains linearly, `{s}` in `detail` ticks in tabular figures, and "Undo available for N seconds" is announced once. Events: `ox-undo`, `ox-undo-expired`.
 - Hold to confirm: `hold` (and `hold-ms`, default 1000), for launches only ("Hold to launch"); approvals are a single click. Pointer down or Space/Enter held for the full time fires `ox-confirm` then `ox-primary`; releasing early cancels, a click alone never sends, key repeat is ignored. Reduced motion fills in four still steps.
 - The primary locks in the same frame as the press (no double send) until `state` changes. `disabled` keeps the controls but makes them read-only (view only, offline). When the state moves under focus, focus moves to the new control (SM5: failure focuses Retry).
@@ -194,7 +257,7 @@ Agents: `pace` (Product, #14b8a6), `eli` (Engineering, #22c55e), `mark` (Marketi
 
 Host every render in one folder, named:
 
-```
+```text
 <agent>-<form>-48.webp     48 x 48
 <agent>-<form>-96.webp     96 x 96
 <agent>-<form>-192.webp    192 x 192
@@ -240,7 +303,7 @@ open demo/index.html # every element in every state; ?theme=light|dark&avatars=<
 ## 0.1 React surfaces
 
 | Component | Widget type | Target score |
-|---|---|---|
+| --- | --- | --- |
 | `PreFlightCheck` | Action | ≥ 88 overall, ≥ 92 hierarchy |
 | `PlanningCanvas` | Process (marquee) | ≥ 90 overall, ≥ 93 hierarchy |
 | `PlanVersionDiff` | Process (Readout) | ≥ 85 overall |
@@ -250,7 +313,7 @@ open demo/index.html # every element in every state; ?theme=light|dark&avatars=<
 | `VaultAndBudgetsSurface` | State | ≥ 85 overall, ≥ 90 security-feel |
 | `AuditLogSurface` | State | ≥ 86 overall |
 
-These components use Tailwind class names; with the preset above, `iris-*` resolves too. Pair with [`@useorgx/orgx-data`](https://github.com/useorgx/data) for typed contracts and hooks.
+These components use Tailwind class names; with the preset above, `iris-*` resolves too. Pair with [`@useorgx/orgx-data`](https://github.com/useorgx/orgx-data) for typed contracts and hooks.
 
 ## Status
 
